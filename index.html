@@ -9,6 +9,7 @@
         :root {
             --primary-bg: #fdfaf9; /* 柔らかな生成り色 */
             --accent-color: #d4a373; /* 上品なシャンパンゴールド */
+            --wish-color: #a8dadc; /* 欲しいものリスト用のアクセント */
             --text-main: #5a544b; /* 優しいチャコールグレー */
             --text-sub: #9e9589;
             --card-bg: #ffffff;
@@ -46,11 +47,20 @@
             margin-bottom: 25px; 
         }
 
+        /* セクション分け */
+        .section-title {
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            margin: 25px 0 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+
         /* 入力エリア */
         .input-group { 
             display: flex; 
             gap: 12px; 
-            margin-bottom: 30px; 
+            margin-bottom: 15px; 
             background: #fcfcfc;
             padding: 6px;
             border-radius: 12px;
@@ -80,13 +90,15 @@
             transition: all 0.3s;
         }
 
+        .add-btn.wish { background: var(--text-sub); }
+
         .add-btn:hover { 
             opacity: 0.8;
             transform: translateY(-1px);
         }
 
         /* リスト表示 */
-        #panel-list { 
+        #panel-list, #wish-list { 
             display: grid; 
             grid-template-columns: 1fr;
             gap: 12px; 
@@ -126,6 +138,36 @@
             font-size: 10px;
         }
 
+        /* 欲しいものリスト特有のスタイル */
+        .wish-thumb {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            background: #f9f9f9;
+            margin: 8px;
+            border-radius: 8px;
+        }
+
+        .wish-link {
+            flex: 1;
+            padding: 12px;
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 0.85rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .wish-link .url-text {
+            font-size: 10px;
+            color: var(--text-sub);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 280px;
+        }
+
         .search-link:hover { color: var(--accent-color); }
         
         .del-btn {
@@ -156,21 +198,32 @@
         <h2>Favorite Collection</h2>
         <p class="label">お気に入りのグッズをチェックしましょう</p>
 
+        <div class="section-title">Quick Search</div>
         <div class="input-group">
-            <input type="text" id="keyword-input" placeholder="キーワードを追加...">
+            <input type="text" id="keyword-input" placeholder="検索ワードを追加...">
             <button class="add-btn" onclick="addPanel()">追加</button>
         </div>
+        <div id="panel-list"></div>
 
-        <div id="panel-list">
-            </div>
+        <div class="section-title">Wish List</div>
+        <div class="input-group">
+            <input type="text" id="wish-input" placeholder="商品のURLを貼り付け...">
+            <button class="add-btn wish" onclick="addWishItem()">保存</button>
+        </div>
+        <div id="wish-list"></div>
     </div>
 
     <script>
         const STORAGE_KEY = 'animate_search_keywords_v2';
+        const WISH_STORAGE_KEY = 'animate_wish_list_v1';
         const BASE_URL = 'https://www.animate-onlineshop.jp/products/list.php?smt=';
 
-        window.onload = () => { loadPanels(); };
+        window.onload = () => { 
+            loadPanels(); 
+            loadWishItems();
+        };
 
+        // --- 検索パネル機能 ---
         function loadPanels() {
             const list = document.getElementById('panel-list');
             list.innerHTML = '';
@@ -193,7 +246,7 @@
             const word = input.value.trim();
             if (word) {
                 const keywords = getKeywords();
-                keywords.unshift(word); // 新しいものを上に
+                keywords.unshift(word);
                 saveKeywords(keywords);
                 input.value = '';
                 loadPanels();
@@ -216,8 +269,65 @@
             localStorage.setItem(STORAGE_KEY, JSON.stringify(keywords));
         }
 
+        // --- 欲しいものリスト機能 ---
+        function loadWishItems() {
+            const list = document.getElementById('wish-list');
+            list.innerHTML = '';
+            const items = getWishItems();
+
+            items.forEach((url, index) => {
+                const div = document.createElement('div');
+                div.className = 'panel-item';
+                
+                // URLからドメインを取得してプレビュー画像（ファビコン等）を表示
+                let domain = "";
+                try { domain = new URL(url).hostname; } catch(e) { domain = "link"; }
+                const iconUrl = `https://www.google.com/s2/favicons?sz=128&domain=${domain}`;
+
+                div.innerHTML = `
+                    <img src="${iconUrl}" class="wish-thumb" alt="icon">
+                    <a class="wish-link" href="${url}" target="_blank">
+                        <strong>欲しいものアイテム ${items.length - index}</strong>
+                        <span class="url-text">${url}</span>
+                    </a>
+                    <button class="del-btn" onclick="deleteWishItem(${index})" title="削除">×</button>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function addWishItem() {
+            const input = document.getElementById('wish-input');
+            const url = input.value.trim();
+            if (url && (url.startsWith('http'))) {
+                const items = getWishItems();
+                items.unshift(url);
+                localStorage.setItem(WISH_STORAGE_KEY, JSON.stringify(items));
+                input.value = '';
+                loadWishItems();
+            } else if (url) {
+                alert("正しいURLを入力してください（httpから始まるもの）");
+            }
+        }
+
+        function deleteWishItem(index) {
+            const items = getWishItems();
+            items.splice(index, 1);
+            localStorage.setItem(WISH_STORAGE_KEY, JSON.stringify(items));
+            loadWishItems();
+        }
+
+        function getWishItems() {
+            const data = localStorage.getItem(WISH_STORAGE_KEY);
+            return data ? JSON.parse(data) : [];
+        }
+
+        // Enterキー対応
         document.getElementById('keyword-input').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') addPanel();
+        });
+        document.getElementById('wish-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addWishItem();
         });
     </script>
 
