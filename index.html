@@ -3,78 +3,174 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>アニメイト巡回パネル Pro</title>
+    <title>Animate Favorite Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;500&family=Quicksand:wght@500&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Helvetica Neue', Arial, sans-serif; text-align: center; background: #f0f2f5; padding: 20px; color: #333; }
-        .container { max-width: 450px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        
+        :root {
+            --primary-bg: #fdfaf9; /* 柔らかな生成り色 */
+            --accent-color: #d4a373; /* 上品なシャンパンゴールド */
+            --text-main: #5a544b; /* 優しいチャコールグレー */
+            --text-sub: #9e9589;
+            --card-bg: #ffffff;
+            --delete-hover: #e5989b; /* くすみピンク */
+        }
+
+        body { 
+            font-family: 'Quicksand', 'Noto Sans JP', sans-serif; 
+            background-color: var(--primary-bg); 
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            letter-spacing: 0.03em;
+        }
+
+        .container { 
+            max-width: 480px; 
+            margin: auto; 
+            background: var(--card-bg); 
+            padding: 30px; 
+            border-radius: 24px; 
+            box-shadow: 0 10px 30px rgba(180, 160, 140, 0.15); 
+        }
+
+        h2 { 
+            font-size: 1.4rem; 
+            margin-bottom: 8px; 
+            color: var(--accent-color);
+            font-weight: 500;
+        }
+
+        .label { 
+            font-size: 12px; 
+            color: var(--text-sub); 
+            margin-bottom: 25px; 
+        }
+
         /* 入力エリア */
-        .input-group { display: flex; gap: 8px; margin-bottom: 20px; }
-        input[type="text"] { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 5px; outline: none; }
-        .add-btn { background: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        .add-btn:hover { background: #218838; }
+        .input-group { 
+            display: flex; 
+            gap: 12px; 
+            margin-bottom: 30px; 
+            background: #fcfcfc;
+            padding: 6px;
+            border-radius: 12px;
+            border: 1px solid #eee;
+        }
+
+        input[type="text"] { 
+            flex: 1; 
+            padding: 12px 15px; 
+            border: none;
+            background: transparent;
+            outline: none; 
+            font-size: 0.95rem;
+            color: var(--text-main);
+        }
+
+        input::placeholder { color: #ccc; }
+
+        .add-btn { 
+            background: var(--accent-color); 
+            color: white; 
+            border: none; 
+            padding: 0 20px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .add-btn:hover { 
+            opacity: 0.8;
+            transform: translateY(-1px);
+        }
 
         /* リスト表示 */
-        #panel-list { display: flex; flex-direction: column; gap: 10px; }
-        .panel-item { display: flex; align-items: stretch; gap: 5px; }
+        #panel-list { 
+            display: grid; 
+            grid-template-columns: 1fr;
+            gap: 12px; 
+        }
+
+        .panel-item { 
+            display: flex; 
+            align-items: stretch; 
+            background: #fff;
+            border: 1px solid #f0ede9;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+            overflow: hidden;
+        }
         
+        .panel-item:hover {
+            border-color: var(--accent-color);
+            box-shadow: 0 4px 12px rgba(212, 163, 115, 0.1);
+        }
+
         .search-link {
             flex: 1;
-            background-color: #004bb0;
-            color: white;
+            color: var(--text-main);
             text-decoration: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: bold;
-            transition: 0.3s;
+            padding: 16px;
+            font-size: 0.95rem;
+            font-weight: 500;
             display: flex;
             align-items: center;
-            justify-content: center;
+            transition: color 0.2s;
         }
-        .search-link:hover { background-color: #003380; transform: translateY(-2px); }
+
+        .search-link::before {
+            content: '❤︎';
+            margin-right: 10px;
+            color: var(--accent-color);
+            font-size: 10px;
+        }
+
+        .search-link:hover { color: var(--accent-color); }
         
         .del-btn {
-            background: #ff4d4d;
-            color: white;
+            background: transparent;
+            color: #ddd;
             border: none;
-            width: 45px;
-            border-radius: 8px;
+            width: 50px;
             cursor: pointer;
             font-size: 18px;
-            transition: 0.3s;
+            transition: all 0.2s;
+            border-left: 1px solid #f8f8f8;
         }
-        .del-btn:hover { background: #cc0000; }
         
-        .label { font-size: 13px; color: #888; margin-bottom: 15px; }
+        .del-btn:hover { 
+            background: #fff5f5;
+            color: var(--delete-hover); 
+        }
+
+        /* スクロールバーのカスタマイズ */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e0e0e0; border-radius: 10px; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2>アニメイト巡回パネル</h2>
-        <p class="label">キーワードを入力してパネルを追加できます</p>
+        <h2>Favorite Collection</h2>
+        <p class="label">お気に入りのグッズをチェックしましょう</p>
 
         <div class="input-group">
-            <input type="text" id="keyword-input" placeholder="検索ワードを入力（例：虹ヶ咲）">
+            <input type="text" id="keyword-input" placeholder="キーワードを追加...">
             <button class="add-btn" onclick="addPanel()">追加</button>
         </div>
-
-        <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 20px;">
 
         <div id="panel-list">
             </div>
     </div>
 
     <script>
-        const STORAGE_KEY = 'animate_search_keywords';
+        const STORAGE_KEY = 'animate_search_keywords_v2';
         const BASE_URL = 'https://www.animate-onlineshop.jp/products/list.php?smt=';
 
-        // 初期読み込み
-        window.onload = () => {
-            loadPanels();
-        };
+        window.onload = () => { loadPanels(); };
 
-        // パネルを読み込んで表示
         function loadPanels() {
             const list = document.getElementById('panel-list');
             list.innerHTML = '';
@@ -83,32 +179,27 @@
             keywords.forEach((word, index) => {
                 const div = document.createElement('div');
                 div.className = 'panel-item';
-                
-                // 検索リンク（エンコード処理をして安全にURL化）
                 const encodedWord = encodeURIComponent(word);
                 div.innerHTML = `
                     <a class="search-link" href="${BASE_URL}${encodedWord}" target="_blank">${word}</a>
-                    <button class="del-btn" onclick="deletePanel(${index})">×</button>
+                    <button class="del-btn" onclick="deletePanel(${index})" title="削除">×</button>
                 `;
                 list.appendChild(div);
             });
         }
 
-        // キーワード追加
         function addPanel() {
             const input = document.getElementById('keyword-input');
             const word = input.value.trim();
-            
             if (word) {
                 const keywords = getKeywords();
-                keywords.push(word);
+                keywords.unshift(word); // 新しいものを上に
                 saveKeywords(keywords);
-                input.value = ''; // 入力欄を空にする
+                input.value = '';
                 loadPanels();
             }
         }
 
-        // キーワード削除
         function deletePanel(index) {
             const keywords = getKeywords();
             keywords.splice(index, 1);
@@ -116,17 +207,15 @@
             loadPanels();
         }
 
-        // ローカルストレージ操作の共通関数
         function getKeywords() {
             const data = localStorage.getItem(STORAGE_KEY);
-            return data ? JSON.parse(data) : ["ラブライブ", "虹ヶ咲", "蓮ノ空"]; // 初期値
+            return data ? JSON.parse(data) : ["虹ヶ咲", "蓮ノ空", "ちいかわ"];
         }
 
         function saveKeywords(keywords) {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(keywords));
         }
 
-        // Enterキーでも追加できるようにする
         document.getElementById('keyword-input').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') addPanel();
         });
