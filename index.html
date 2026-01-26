@@ -88,6 +88,7 @@
             cursor: pointer; 
             font-size: 14px;
             transition: all 0.3s;
+            white-space: nowrap;
         }
 
         .add-btn.wish { background: var(--text-sub); }
@@ -95,6 +96,11 @@
         .add-btn:hover { 
             opacity: 0.8;
             transform: translateY(-1px);
+        }
+
+        .add-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
         }
 
         /* リスト表示 */
@@ -142,10 +148,11 @@
         .wish-thumb {
             width: 50px;
             height: 50px;
-            object-fit: contain;
+            object-fit: cover;
             background: #f9f9f9;
             margin: 8px;
             border-radius: 8px;
+            border: 1px solid #f0f0f0;
         }
 
         .wish-link {
@@ -157,6 +164,14 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
+            overflow: hidden;
+        }
+
+        .wish-link strong {
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         .wish-link .url-text {
@@ -208,14 +223,14 @@
         <div class="section-title">Wish List</div>
         <div class="input-group">
             <input type="text" id="wish-input" placeholder="商品のURLを貼り付け...">
-            <button class="add-btn wish" onclick="addWishItem()">保存</button>
+            <button id="wish-save-btn" class="add-btn wish" onclick="addWishItem()">保存</button>
         </div>
         <div id="wish-list"></div>
     </div>
 
     <script>
         const STORAGE_KEY = 'animate_search_keywords_v2';
-        const WISH_STORAGE_KEY = 'animate_wish_list_v1';
+        const WISH_STORAGE_KEY = 'animate_wish_list_v2'; // データ形式が変わるためバージョンを上げます
         const BASE_URL = 'https://www.animate-onlineshop.jp/products/list.php?smt=';
 
         window.onload = () => { 
@@ -275,20 +290,19 @@
             list.innerHTML = '';
             const items = getWishItems();
 
-            items.forEach((url, index) => {
+            items.forEach((item, index) => {
                 const div = document.createElement('div');
                 div.className = 'panel-item';
                 
-                // URLからドメインを取得してプレビュー画像（ファビコン等）を表示
-                let domain = "";
-                try { domain = new URL(url).hostname; } catch(e) { domain = "link"; }
-                const iconUrl = `https://www.google.com/s2/favicons?sz=128&domain=${domain}`;
+                // 画像が取得できなかった場合のフォールバック（ファビコン）
+                const fallbackIcon = `https://www.google.com/s2/favicons?sz=128&domain=${new URL(item.url).hostname}`;
+                const thumbUrl = item.image || fallbackIcon;
 
                 div.innerHTML = `
-                    <img src="${iconUrl}" class="wish-thumb" alt="icon">
-                    <a class="wish-link" href="${url}" target="_blank">
-                        <strong>欲しいものアイテム ${items.length - index}</strong>
-                        <span class="url-text">${url}</span>
+                    <img src="${thumbUrl}" class="wish-thumb" alt="thumb" onerror="this.src='${fallbackIcon}'">
+                    <a class="wish-link" href="${item.url}" target="_blank">
+                        <strong>${item.title || '無題の商品'}</strong>
+                        <span class="url-text">${item.url}</span>
                     </a>
                     <button class="del-btn" onclick="deleteWishItem(${index})" title="削除">×</button>
                 `;
@@ -296,15 +310,43 @@
             });
         }
 
-        function addWishItem() {
+        async function addWishItem() {
             const input = document.getElementById('wish-input');
+            const btn = document.getElementById('wish-save-btn');
             const url = input.value.trim();
+
             if (url && (url.startsWith('http'))) {
-                const items = getWishItems();
-                items.unshift(url);
-                localStorage.setItem(WISH_STORAGE_KEY, JSON.stringify(items));
-                input.value = '';
-                loadWishItems();
+                btn.disabled = true;
+                btn.innerText = "取得中...";
+
+                try {
+                    // microlink APIを使用してURLの情報を取得
+                    const response = await fetch(`https://api.microlink.io?url=${encodeURIComponent(url)}`);
+                    const data = await response.json();
+                    
+                    const newItem = {
+                        url: url,
+                        title: data.data.title || "商品ページ",
+                        image: data.data.image ? data.data.image.url : null
+                    };
+
+                    const items = getWishItems();
+                    items.unshift(newItem);
+                    localStorage.setItem(WISH_STORAGE_KEY, JSON.stringify(items));
+                    
+                    input.value = '';
+                    loadWishItems();
+                } catch (error) {
+                    console.error("情報取得エラー:", error);
+                    // 取得に失敗してもURLだけは保存する
+                    const items = getWishItems();
+                    items.unshift({ url: url, title: "情報取得エラー(URLのみ保存)", image: null });
+                    localStorage.setItem(WISH_STORAGE_KEY, JSON.stringify(items));
+                    loadWishItems();
+                } finally {
+                    btn.disabled = false;
+                    btn.innerText = "保存";
+                }
             } else if (url) {
                 alert("正しいURLを入力してください（httpから始まるもの）");
             }
