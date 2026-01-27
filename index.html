@@ -1,6 +1,20 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+    <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#d4a373">
+<link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1067/1067555.png">
+
+<script>
+  // Service Worker の登録
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('Service Worker registered'))
+        .catch(err => console.error('Service Worker registration failed', err));
+    });
+  }
+</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Animate Favorite Panel</title>
