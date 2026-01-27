@@ -28,6 +28,7 @@
             --text-sub: #9e9589;
             --card-bg: #ffffff;
             --delete-hover: #e5989b; /* くすみピンク */
+            --gamers-color: #0076c0; /* ゲーマーズイメージカラー（アクセント用） */
         }
 
         body { 
@@ -128,7 +129,7 @@
 
         .panel-item { 
             display: flex;
-            align-items: stretch; 
+            align-items: center; 
             background: #fff;
             border: 1px solid #f0ede9;
             border-radius: 12px;
@@ -141,31 +142,36 @@
             box-shadow: 0 4px 12px rgba(212, 163, 115, 0.1);
         }
 
-        /* 検索リンクボタン（2サイト同時用） */
-        .search-trigger {
-            flex: 1;
+        /* 左右ボタン形式のスタイル */
+        .shop-btn {
+            padding: 16px 12px;
             background: transparent;
             border: none;
-            text-align: left;
             cursor: pointer;
-            color: var(--text-main);
-            padding: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-sub);
+            transition: all 0.2s;
+            min-width: 65px;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .shop-btn:hover {
+            background: #fdfaf9;
+            color: var(--accent-color);
+        }
+
+        .keyword-display {
+            flex: 1;
+            text-align: center;
             font-size: 0.95rem;
             font-weight: 500;
-            font-family: inherit;
-            display: flex;
-            align-items: center;
-            transition: color 0.2s;
+            color: var(--text-main);
+            padding: 0 10px;
+            border-left: 1px solid #f8f8f8;
+            border-right: 1px solid #f8f8f8;
         }
-
-        .search-trigger::before {
-            content: '❤︎';
-            margin-right: 10px;
-            color: var(--accent-color);
-            font-size: 10px;
-        }
-
-        .search-trigger:hover { color: var(--accent-color); }
 
         /* 欲しいものリスト特有のスタイル */
         .wish-thumb {
@@ -210,7 +216,8 @@
             background: transparent;
             color: #ddd;
             border: none;
-            width: 50px;
+            width: 44px;
+            height: 100%;
             cursor: pointer;
             font-size: 18px;
             transition: all 0.2s;
@@ -232,7 +239,7 @@
 
     <div class="container">
         <h2>Favorite Collection</h2>
-        <p class="label">アニメイト＆ゲーマーズを同時検索</p>
+        <p class="label">左右のボタンからショップを選択</p>
 
         <div class="section-title">Quick Search</div>
         <div class="input-group">
@@ -269,21 +276,16 @@
             keywords.forEach((word, index) => {
                 const div = document.createElement('div');
                 div.className = 'panel-item';
+                const encodedWord = encodeURIComponent(word);
+                
                 div.innerHTML = `
-                    <button class="search-trigger" onclick="searchBoth('${word}')">${word}</button>
+                    <a href="${ANIMATE_URL}${encodedWord}" target="_blank" class="shop-btn" style="color:#e60012;">アニメイト</a>
+                    <div class="keyword-display">${word}</div>
+                    <a href="${GAMERS_URL}${encodedWord}" target="_blank" class="shop-btn" style="color:#0076c0;">ゲーマーズ</a>
                     <button class="del-btn" onclick="deletePanel(${index})" title="削除">×</button>
                 `;
                 list.appendChild(div);
             });
-        }
-
-        // アニメイトとゲーマーズを同時に開く関数
-        function searchBoth(word) {
-            const encodedWord = encodeURIComponent(word);
-            // アニメイトを開く
-            window.open(`${ANIMATE_URL}${encodedWord}`, '_blank');
-            // ゲーマーズを開く
-            window.open(`${GAMERS_URL}${encodedWord}`, '_blank');
         }
 
         function addPanel() {
