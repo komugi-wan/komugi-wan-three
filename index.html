@@ -2,239 +2,248 @@
 <html lang="ja">
 <head>
     <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#d4a373">
-<link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1067/1067555.png">
+    <meta name="theme-color" content="#d4a373">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1067/1067555.png">
 
 <script>
-  // Service Worker の登録
+  // Service Worker の登録 [cite: 1]
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./sw.js')
         .then(reg => console.log('Service Worker registered'))
         .catch(err => console.error('Service Worker registration failed', err));
     });
-  }
+  } [cite: 2]
 </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Animate Favorite Panel</title>
+    <title>Animate & Gamers Favorite Panel</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;500&family=Quicksand:wght@500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-bg: #fdfaf9; /* 柔らかな生成り色 */
-            --accent-color: #d4a373; /* 上品なシャンパンゴールド */
-            --wish-color: #a8dadc; /* 欲しいものリスト用のアクセント */
-            --text-main: #5a544b; /* 優しいチャコールグレー */
+            --primary-bg: #fdfaf9; [cite: 3] /* 柔らかな生成り色 */
+            --accent-color: #d4a373; [cite: 4] /* 上品なシャンパンゴールド */
+            --gamers-color: #ef4123; /* ゲーマーズ風のアクセントカラー */
+            --wish-color: #a8dadc; [cite: 5] /* 欲しいものリスト用のアクセント */
+            --text-main: #5a544b; [cite: 6] /* 優しいチャコールグレー */
             --text-sub: #9e9589;
             --card-bg: #ffffff;
-            --delete-hover: #e5989b; /* くすみピンク */
+            --delete-hover: #e5989b; [cite: 7] /* くすみピンク */
         }
 
         body { 
-            font-family: 'Quicksand', 'Noto Sans JP', sans-serif; 
-            background-color: var(--primary-bg); 
+            font-family: 'Quicksand', 'Noto Sans JP', sans-serif;
+            background-color: var(--primary-bg); [cite: 8]
             color: var(--text-main);
             margin: 0;
             padding: 40px 20px;
-            letter-spacing: 0.03em;
+            letter-spacing: 0.03em; [cite: 9]
         }
 
         .container { 
-            max-width: 480px; 
-            margin: auto; 
+            max-width: 480px;
+            margin: auto; [cite: 10]
             background: var(--card-bg); 
             padding: 30px; 
             border-radius: 24px; 
-            box-shadow: 0 10px 30px rgba(180, 160, 140, 0.15); 
+            box-shadow: 0 10px 30px rgba(180, 160, 140, 0.15); [cite: 11]
         }
 
         h2 { 
-            font-size: 1.4rem; 
-            margin-bottom: 8px; 
+            font-size: 1.4rem;
+            margin-bottom: 8px; [cite: 12]
             color: var(--accent-color);
             font-weight: 500;
         }
 
         .label { 
-            font-size: 12px; 
-            color: var(--text-sub); 
+            font-size: 12px;
+            color: var(--text-sub); [cite: 13]
             margin-bottom: 25px; 
         }
 
-        /* セクション分け */
         .section-title {
             font-size: 0.9rem;
-            color: var(--text-sub);
+            color: var(--text-sub); [cite: 14]
             margin: 25px 0 10px;
             border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
+            padding-bottom: 5px; [cite: 15]
         }
 
-        /* 入力エリア */
         .input-group { 
-            display: flex; 
-            gap: 12px; 
+            display: flex;
+            gap: 12px; [cite: 16]
             margin-bottom: 15px; 
             background: #fcfcfc;
             padding: 6px;
             border-radius: 12px;
-            border: 1px solid #eee;
+            border: 1px solid #eee; [cite: 17]
         }
 
         input[type="text"] { 
-            flex: 1; 
-            padding: 12px 15px; 
+            flex: 1;
+            padding: 12px 15px; [cite: 18]
             border: none;
             background: transparent;
             outline: none; 
             font-size: 0.95rem;
-            color: var(--text-main);
+            color: var(--text-main); [cite: 19]
         }
 
-        input::placeholder { color: #ccc; }
+        input::placeholder { color: #ccc; [cite: 20] }
 
         .add-btn { 
-            background: var(--accent-color); 
-            color: white; 
+            background: var(--accent-color);
+            color: white; [cite: 21]
             border: none; 
             padding: 0 20px; 
             border-radius: 8px; 
             cursor: pointer; 
             font-size: 14px;
             transition: all 0.3s;
-            white-space: nowrap;
+            white-space: nowrap; [cite: 22]
         }
 
-        .add-btn.wish { background: var(--text-sub); }
+        .add-btn.gamers { background: var(--gamers-color); }
+        .add-btn.wish { background: var(--text-sub); [cite: 23] }
 
         .add-btn:hover { 
             opacity: 0.8;
-            transform: translateY(-1px);
+            transform: translateY(-1px); [cite: 24]
         }
 
         .add-btn:disabled {
-            background: #ccc;
+            background: #ccc; [cite: 25]
             cursor: not-allowed;
         }
 
-        /* リスト表示 */
-        #panel-list, #wish-list { 
-            display: grid; 
-            grid-template-columns: 1fr;
+        #panel-list, #gamers-list, #wish-list { 
+            display: grid;
+            grid-template-columns: 1fr; [cite: 26]
             gap: 12px; 
         }
 
         .panel-item { 
-            display: flex; 
-            align-items: stretch; 
+            display: flex;
+            align-items: stretch; [cite: 27]
             background: #fff;
             border: 1px solid #f0ede9;
             border-radius: 12px;
             transition: all 0.2s ease;
-            overflow: hidden;
+            overflow: hidden; [cite: 28]
         }
         
         .panel-item:hover {
             border-color: var(--accent-color);
-            box-shadow: 0 4px 12px rgba(212, 163, 115, 0.1);
+            box-shadow: 0 4px 12px rgba(212, 163, 115, 0.1); [cite: 29]
         }
 
         .search-link {
             flex: 1;
-            color: var(--text-main);
+            color: var(--text-main); [cite: 30]
             text-decoration: none;
             padding: 16px;
             font-size: 0.95rem;
             font-weight: 500;
             display: flex;
             align-items: center;
-            transition: color 0.2s;
+            transition: color 0.2s; [cite: 31]
         }
 
         .search-link::before {
             content: '❤︎';
-            margin-right: 10px;
+            margin-right: 10px; [cite: 32]
             color: var(--accent-color);
             font-size: 10px;
         }
+        
+        /* ゲーマーズ用の色付け */
+        .gamers-item:hover { border-color: var(--gamers-color); }
+        .gamers-link:hover { color: var(--gamers-color); }
+        .gamers-link::before { color: var(--gamers-color); }
 
-        /* 欲しいものリスト特有のスタイル */
         .wish-thumb {
             width: 50px;
-            height: 50px;
+            height: 50px; [cite: 33]
             object-fit: cover;
             background: #f9f9f9;
             margin: 8px;
             border-radius: 8px;
-            border: 1px solid #f0f0f0;
+            border: 1px solid #f0f0f0; [cite: 34]
         }
 
         .wish-link {
             flex: 1;
-            padding: 12px;
+            padding: 12px; [cite: 35]
             text-decoration: none;
             color: var(--text-main);
             font-size: 0.85rem;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            overflow: hidden;
+            overflow: hidden; [cite: 36]
         }
 
         .wish-link strong {
             display: -webkit-box;
-            -webkit-line-clamp: 1;
+            -webkit-line-clamp: 1; [cite: 37]
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
 
         .wish-link .url-text {
             font-size: 10px;
-            color: var(--text-sub);
+            color: var(--text-sub); [cite: 38]
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 280px;
+            max-width: 280px; [cite: 39]
         }
 
-        .search-link:hover { color: var(--accent-color); }
+        .search-link:hover { color: var(--accent-color); [cite: 40] }
         
         .del-btn {
             background: transparent;
-            color: #ddd;
+            color: #ddd; [cite: 41]
             border: none;
             width: 50px;
             cursor: pointer;
             font-size: 18px;
             transition: all 0.2s;
-            border-left: 1px solid #f8f8f8;
+            border-left: 1px solid #f8f8f8; [cite: 42]
         }
         
         .del-btn:hover { 
             background: #fff5f5;
-            color: var(--delete-hover); 
+            color: var(--delete-hover); [cite: 43]
         }
 
-        /* スクロールバーのカスタマイズ */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #e0e0e0; border-radius: 10px; }
+        ::-webkit-scrollbar { width: 6px; [cite: 44] }
+        ::-webkit-scrollbar-track { background: transparent; [cite: 45] }
+        ::-webkit-scrollbar-thumb { background: #e0e0e0; border-radius: 10px; [cite: 46] }
     </style>
 </head>
 <body>
 
     <div class="container">
         <h2>Favorite Collection</h2>
-        <p class="label">お気に入りのグッズをチェックしましょう</p>
+        <p class="label">お気に入りのショップでグッズを検索しましょう</p>
 
-        <div class="section-title">Quick Search</div>
+        <div class="section-title">Quick Search (Animate)</div>
         <div class="input-group">
-            <input type="text" id="keyword-input" placeholder="検索ワードを追加...">
+            <input type="text" id="keyword-input" placeholder="アニメイト検索ワード...">
             <button class="add-btn" onclick="addPanel()">追加</button>
         </div>
         <div id="panel-list"></div>
 
-        <div class="section-title">Wish List</div>
+        <div class="section-title">Quick Search (Gamers)</div>
+        <div class="input-group">
+            <input type="text" id="gamers-input" placeholder="ゲーマーズ検索ワード...">
+            <button class="add-btn gamers" onclick="addGamersPanel()">追加</button>
+        </div>
+        <div id="gamers-list"></div>
+
+        <div class="section-title">Wish List</div> [cite: 47]
         <div class="input-group">
             <input type="text" id="wish-input" placeholder="商品のURLを貼り付け...">
             <button id="wish-save-btn" class="add-btn wish" onclick="addWishItem()">保存</button>
@@ -243,64 +252,99 @@
     </div>
 
     <script>
-        const STORAGE_KEY = 'animate_search_keywords_v2';
-        const WISH_STORAGE_KEY = 'animate_wish_list_v2'; // データ形式が変わるためバージョンを上げます
-        const BASE_URL = 'https://www.animate-onlineshop.jp/products/list.php?smt=';
+        const STORAGE_KEY = 'animate_search_keywords_v2'; [cite: 48]
+        const GAMERS_STORAGE_KEY = 'gamers_search_keywords_v1';
+        const WISH_STORAGE_KEY = 'animate_wish_list_v2';
+        
+        const ANIMATE_URL = 'https://www.animate-onlineshop.jp/products/list.php?smt='; [cite: 49]
+        const GAMERS_URL = 'https://www.gamers.co.jp/products/list.php?smt=';
 
         window.onload = () => { 
             loadPanels(); 
-            loadWishItems();
+            loadGamersPanels();
+            loadWishItems(); [cite: 50]
         };
 
-        // --- 検索パネル機能 ---
+        // --- アニメイト検索パネル ---
         function loadPanels() {
-            const list = document.getElementById('panel-list');
+            const list = document.getElementById('panel-list'); [cite: 51]
             list.innerHTML = '';
-            const keywords = getKeywords();
+            const keywords = getKeywords(STORAGE_KEY, ["虹ヶ咲", "蓮ノ空", "ちいかわ"]);
 
             keywords.forEach((word, index) => {
                 const div = document.createElement('div');
                 div.className = 'panel-item';
                 const encodedWord = encodeURIComponent(word);
                 div.innerHTML = `
-                    <a class="search-link" href="${BASE_URL}${encodedWord}" target="_blank">${word}</a>
-                    <button class="del-btn" onclick="deletePanel(${index})" title="削除">×</button>
-                `;
+                    <a class="search-link" href="${ANIMATE_URL}${encodedWord}" target="_blank">${word}</a>
+                    <button class="del-btn" onclick="deletePanel('${STORAGE_KEY}', ${index}, loadPanels)" title="削除">×</button>
+                `; [cite: 52]
                 list.appendChild(div);
-            });
+            }); [cite: 53]
         }
 
         function addPanel() {
-            const input = document.getElementById('keyword-input');
+            const input = document.getElementById('keyword-input'); [cite: 54]
             const word = input.value.trim();
             if (word) {
-                const keywords = getKeywords();
+                const keywords = getKeywords(STORAGE_KEY, []); [cite: 55]
                 keywords.unshift(word);
-                saveKeywords(keywords);
+                saveKeywords(STORAGE_KEY, keywords);
                 input.value = '';
                 loadPanels();
             }
         }
 
-        function deletePanel(index) {
-            const keywords = getKeywords();
+        // --- ゲーマーズ検索パネル ---
+        function loadGamersPanels() {
+            const list = document.getElementById('gamers-list');
+            list.innerHTML = '';
+            const keywords = getKeywords(GAMERS_STORAGE_KEY, ["ラブライブ", "アイマス"]);
+
+            keywords.forEach((word, index) => {
+                const div = document.createElement('div');
+                div.className = 'panel-item gamers-item';
+                const encodedWord = encodeURIComponent(word);
+                div.innerHTML = `
+                    <a class="search-link gamers-link" href="${GAMERS_URL}${encodedWord}" target="_blank">${word}</a>
+                    <button class="del-btn" onclick="deletePanel('${GAMERS_STORAGE_KEY}', ${index}, loadGamersPanels)" title="削除">×</button>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function addGamersPanel() {
+            const input = document.getElementById('gamers-input');
+            const word = input.value.trim();
+            if (word) {
+                const keywords = getKeywords(GAMERS_STORAGE_KEY, []);
+                keywords.unshift(word);
+                saveKeywords(GAMERS_STORAGE_KEY, keywords);
+                input.value = '';
+                loadGamersPanels();
+            }
+        }
+
+        // 共通処理
+        function deletePanel(key, index, callback) {
+            const keywords = getKeywords(key, []); [cite: 56]
             keywords.splice(index, 1);
-            saveKeywords(keywords);
-            loadPanels();
+            saveKeywords(key, keywords);
+            callback();
         }
 
-        function getKeywords() {
-            const data = localStorage.getItem(STORAGE_KEY);
-            return data ? JSON.parse(data) : ["虹ヶ咲", "蓮ノ空", "ちいかわ"];
+        function getKeywords(key, defaults) {
+            const data = localStorage.getItem(key); [cite: 57]
+            return data ? JSON.parse(data) : defaults;
         }
 
-        function saveKeywords(keywords) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(keywords));
+        function saveKeywords(key, keywords) {
+            localStorage.setItem(key, JSON.stringify(keywords)); [cite: 58]
         }
 
         // --- 欲しいものリスト機能 ---
         function loadWishItems() {
-            const list = document.getElementById('wish-list');
+            const list = document.getElementById('wish-list'); [cite: 59]
             list.innerHTML = '';
             const items = getWishItems();
 
@@ -308,73 +352,69 @@
                 const div = document.createElement('div');
                 div.className = 'panel-item';
                 
-                // 画像が取得できなかった場合のフォールバック（ファビコン）
-                const fallbackIcon = `https://www.google.com/s2/favicons?sz=128&domain=${new URL(item.url).hostname}`;
+                const fallbackIcon = `https://www.google.com/s2/favicons?sz=128&domain=${new URL(item.url).hostname}`; [cite: 60]
                 const thumbUrl = item.image || fallbackIcon;
 
                 div.innerHTML = `
                     <img src="${thumbUrl}" class="wish-thumb" alt="thumb" onerror="this.src='${fallbackIcon}'">
                     <a class="wish-link" href="${item.url}" target="_blank">
-                        <strong>${item.title || '無題の商品'}</strong>
+                        <strong>${item.title || '無題の商品'}</strong> [cite: 61]
                         <span class="url-text">${item.url}</span>
                     </a>
                     <button class="del-btn" onclick="deleteWishItem(${index})" title="削除">×</button>
                 `;
-                list.appendChild(div);
-            });
+                list.appendChild(div); [cite: 62]
+            }); [cite: 63]
         }
 
         async function addWishItem() {
-            const input = document.getElementById('wish-input');
+            const input = document.getElementById('wish-input'); [cite: 64]
             const btn = document.getElementById('wish-save-btn');
             const url = input.value.trim();
 
             if (url && (url.startsWith('http'))) {
-                btn.disabled = true;
+                btn.disabled = true; [cite: 65]
                 btn.innerText = "取得中...";
 
                 try {
-                    // microlink APIを使用してURLの情報を取得
-                    const response = await fetch(`https://api.microlink.io?url=${encodeURIComponent(url)}`);
+                    const response = await fetch(`https://api.microlink.io?url=${encodeURIComponent(url)}`); [cite: 66]
                     const data = await response.json();
                     
                     const newItem = {
                         url: url,
-                        title: data.data.title || "商品ページ",
-                        image: data.data.image ? data.data.image.url : null
+                        title: data.data.title || "商品ページ", [cite: 67]
+                        image: data.data.image ? data.data.image.url : null [cite: 68]
                     };
-
-                    const items = getWishItems();
+                    const items = getWishItems(); [cite: 69]
                     items.unshift(newItem);
                     localStorage.setItem(WISH_STORAGE_KEY, JSON.stringify(items));
                     
                     input.value = '';
-                    loadWishItems();
+                    loadWishItems(); [cite: 70]
                 } catch (error) {
-                    console.error("情報取得エラー:", error);
-                    // 取得に失敗してもURLだけは保存する
-                    const items = getWishItems();
+                    console.error("情報取得エラー:", error); [cite: 71]
+                    const items = getWishItems(); [cite: 72]
                     items.unshift({ url: url, title: "情報取得エラー(URLのみ保存)", image: null });
                     localStorage.setItem(WISH_STORAGE_KEY, JSON.stringify(items));
-                    loadWishItems();
+                    loadWishItems(); [cite: 73]
                 } finally {
-                    btn.disabled = false;
+                    btn.disabled = false; [cite: 74]
                     btn.innerText = "保存";
                 }
             } else if (url) {
-                alert("正しいURLを入力してください（httpから始まるもの）");
+                alert("正しいURLを入力してください（httpから始まるもの）"); [cite: 75]
             }
         }
 
         function deleteWishItem(index) {
-            const items = getWishItems();
+            const items = getWishItems(); [cite: 76]
             items.splice(index, 1);
             localStorage.setItem(WISH_STORAGE_KEY, JSON.stringify(items));
             loadWishItems();
         }
 
         function getWishItems() {
-            const data = localStorage.getItem(WISH_STORAGE_KEY);
+            const data = localStorage.getItem(WISH_STORAGE_KEY); [cite: 77]
             return data ? JSON.parse(data) : [];
         }
 
@@ -382,9 +422,12 @@
         document.getElementById('keyword-input').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') addPanel();
         });
+        document.getElementById('gamers-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addGamersPanel();
+        }); [cite: 78]
         document.getElementById('wish-input').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') addWishItem();
-        });
+        }); [cite: 79]
     </script>
 
 </body>
