@@ -29,6 +29,10 @@
             --card-bg: #ffffff;
             --delete-hover: #e5989b; /* くすみピンク */
             --gamers-color: #0076c0; /* ゲーマーズイメージカラー（アクセント用） */
+            
+            /* 新設：ショップ別パステルカラー */
+            --animate-soft: #e6f0fa; 
+            --gamers-soft: #fff5e6;
         }
 
         body { 
@@ -156,11 +160,15 @@
             text-decoration: none;
         }
 
-        .shop-btn img {
-            width: 20px;
-            height: 20px;
-            border-radius: 4px;
+        /* 単色カラーアイコンのベース */
+        .color-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            display: inline-block;
         }
+        .dot-animate { background-color: var(--animate-soft); }
+        .dot-gamers { background-color: var(--gamers-soft); }
 
         .shop-btn:hover {
             background: #fdfaf9;
@@ -284,14 +292,14 @@
                 div.className = 'panel-item';
                 const encodedWord = encodeURIComponent(word);
                 
-                // アイコン付きボタンのHTML（並び順：キーワード -> アニメイト -> ゲーマーズ -> 削除）
+                // アイコン付きボタンのHTML（アイコンを単色ドットに変更）
                 div.innerHTML = `
                     <div class="keyword-display">${word}</div>
                     <a href="${ANIMATE_URL}${encodedWord}" target="_blank" class="shop-btn" title="アニメイトで検索">
-                        <img src="https://www.google.com/s2/favicons?sz=64&domain=animate-onlineshop.jp" alt="A">
+                        <span class="color-dot dot-animate"></span>
                     </a>
                     <a href="${GAMERS_URL}${encodedWord}" target="_blank" class="shop-btn" title="ゲーマーズで検索">
-                        <img src="https://www.google.com/s2/favicons?sz=64&domain=gamers.co.jp" alt="G">
+                        <span class="color-dot dot-gamers"></span>
                     </a>
                     <button class="del-btn" onclick="deletePanel(${index})" title="削除">×</button>
                 `;
