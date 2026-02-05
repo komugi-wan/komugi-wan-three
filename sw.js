@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fav-panel-v1.1'; // 更新時はここを変更
+const CACHE_NAME = 'fav-panel-v1.2'; // 更新時はここを変更
 const ASSETS = [
   './',
   './index.html',
@@ -44,6 +44,7 @@ self.addEventListener('fetch', (event) => {
       })
   );
 });
+
 
 
 
