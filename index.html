@@ -100,7 +100,15 @@
         .add-btn:active { transform: scale(0.95); opacity: 0.8; }
         .add-btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
 
-        .panel-list { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 15px; }
+        /* 基本のパネルリスト（キーワード用などは1列） */
+.panel-list { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 15px; }
+
+/* Wishリストの親要素の設定を上書き */
+#wish-list { 
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: 12px; 
+}
 
         .wish-tabs, .group-tabs {
             display: flex; gap: 5px; margin-bottom: 15px;
