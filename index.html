@@ -100,29 +100,48 @@
         .add-btn:active { transform: scale(0.95); opacity: 0.8; }
         .add-btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
 
-        /* 1. 通常のパネルリスト（キーワード等）は1列 */
-.panel-list { 
-    display: grid; 
-    grid-template-columns: 1fr; 
-    gap: 12px; 
-    margin-bottom: 15px; 
-}
+        .panel-list { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 15px; }
 
-/* 2. Wishリスト専用の設定（強制的に2列にするための修正） */
-#wish-list.panel-list { 
-    display: flex !important; 
-    flex-wrap: wrap !important; 
-    flex-direction: row !important;
-    gap: 12px; 
-}
+        .wish-tabs, .group-tabs {
+            display: flex; gap: 5px; margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            overflow-x: auto; white-space: nowrap;
+            -webkit-overflow-scrolling: touch; /* スムーズスクロール */
+            padding-bottom: 5px; /* スクロールバー用余白 */
+        }
 
-/* 3. Wishリスト内の各アイテムの幅を確定させる */
-#wish-list .panel-item { 
-    position: relative; 
-    flex-direction: column; 
-    width: calc(50% - 6px) !important; /* 50%から隙間の半分を引く */
-    box-sizing: border-box;
-}
+        .wish-tab, .group-tab {
+            flex: 1; padding: 8px 5px; font-size: 0.75rem; text-align: center;
+            cursor: pointer; border-radius: 8px 8px 0 0; color: var(--text-sub);
+            transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 2px;
+            min-width: 60px; /* タップしやすく */
+        }
+
+        .wish-tab:active, .group-tab:active { background: #fff5f5; }
+
+        .wish-tab.active, .group-tab.active {
+            background: var(--primary-bg); color: var(--text-main);
+            font-weight: bold; border-bottom: 2px solid var(--accent-color);
+        }
+
+        .tab-badge { font-size: 10px; background: #f0eded; padding: 1px 6px; border-radius: 10px; }
+        .active .tab-badge { background: var(--accent-color); color: white; }
+
+        /* タグチップ用のスタイル */
+        .filter-tags-container {
+            display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px;
+        }
+        .tag-chip {
+            padding: 4px 12px; border-radius: 20px; background: #fdf0f0;
+            font-size: 11px; color: var(--text-sub); cursor: pointer;
+            transition: all 0.2s; border: 1px solid transparent;
+        }
+        .tag-chip.active {
+            background: var(--accent-color); color: white;
+            box-shadow: 0 2px 8px rgba(229, 152, 155, 0.3);
+        }
+
+        #wish-list { display: flex; flex-wrap: wrap; gap: 12px; }
 
         .panel-item { 
             display: flex; align-items: center; background: #fff;
