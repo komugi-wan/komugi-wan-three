@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fav-panel-v1';
+const CACHE_NAME = 'fav-panel-v1.1';
 const ASSETS = [
   './',
   './index.html',
@@ -21,4 +21,5 @@ self.addEventListener('fetch', (event) => {
       return response || fetch(event.request);
     })
   );
+
 });
