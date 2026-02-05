@@ -15,162 +15,131 @@
       // Service Worker の登録
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-        
-
-  navigator.serviceWorker.register('./sw.js')
+          navigator.serviceWorker.register('./sw.js')
             .then(reg => console.log('Service Worker registered:', reg.scope))
             .catch(err => console.error('Service Worker registration failed:', err));
         });
-}
+      }
     </script>
 
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;500&family=Quicksand:wght@500&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-bg: #fdfaf9;
-/* 柔らかな生成り色 */
             --accent-color: #d4a373;
-/* 上品なシャンパンゴールド */
             --wish-color: #a8dadc;
-/* 欲しいものリスト用のアクセント */
             --text-main: #5a544b;
-/* 優しいチャコールグレー */
             --text-sub: #9e9589;
             --card-bg: #ffffff;
             --delete-hover: #e5989b;
-/* くすみピンク */
             --gamers-color: #0076c0;
-/* ゲーマーズイメージカラー（アクセント用） */
-            
-            /* 新設：ショップ別パステルカラー */
             --animate-soft: #e6f0fa;
---gamers-soft: #fff5e6;
-
-            /* ステータス用カラー */
+            --gamers-soft: #fff5e6;
             --status-mayoi: #d1d1d1;
             --status-bought: #f28482;
---status-future: #84a59d;
-            --status-cancel: #b0aba4; /* 「やめた」用のカラー */
-
-            /* モーダル用 */
+            --status-future: #84a59d;
+            --status-cancel: #b0aba4;
             --overlay-bg: rgba(90, 84, 75, 0.4);
-}
+        }
 
         body { 
             font-family: 'Quicksand', 'Noto Sans JP', sans-serif;
-background-color: var(--primary-bg); 
+            background-color: var(--primary-bg); 
             color: var(--text-main);
             margin: 0;
             padding: 40px 20px;
             letter-spacing: 0.03em;
             -webkit-tap-highlight-color: transparent;
-/* スマホでの誤操作防止 */
             -webkit-touch-callout: none;
             -webkit-user-select: none;
             user-select: none;
-}
+        }
 
         .container { 
             max-width: 480px;
-margin: auto; 
+            margin: auto; 
             background: var(--card-bg); 
             padding: 30px; 
             border-radius: 24px; 
             box-shadow: 0 10px 30px rgba(180, 160, 140, 0.15);
-}
+        }
 
         h2 { 
             font-size: 1.4rem;
-margin-bottom: 8px; 
+            margin-bottom: 8px; 
             color: var(--accent-color);
             font-weight: 500;
         }
 
         .label { 
             font-size: 12px;
-color: var(--text-sub); 
+            color: var(--text-sub); 
             margin-bottom: 25px; 
         }
 
-        /* セクション分け */
         .section-title {
             font-size: 0.9rem;
-color: var(--text-sub);
+            color: var(--text-sub);
             margin: 25px 0 10px;
             border-bottom: 1px solid #eee;
             padding-bottom: 5px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-}
+        }
 
-        /* グループ管理用 */
-        .group-header {
-            font-size: 0.85rem;
-color: var(--accent-color);
-            margin: 20px 0 8px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-}
-
-        /* 入力エリア */
         .input-group { 
             display: flex;
-gap: 12px; 
+            gap: 12px; 
             margin-bottom: 10px; 
             background: #fcfcfc;
             padding: 6px;
             border-radius: 12px;
             border: 1px solid #eee;
-}
+        }
 
         .input-controls {
             display: flex;
-gap: 8px;
+            gap: 8px;
             margin-bottom: 15px;
         }
 
-        /* Wish用入力エリアの拡張 */
         .wish-input-container {
             margin-bottom: 15px;
-}
+        }
         .wish-controls {
             display: flex;
-gap: 8px;
+            gap: 8px;
             margin-top: 8px;
         }
 
         input[type="text"], select { 
             flex: 1;
-padding: 12px 15px; 
+            padding: 12px 15px; 
             border: none;
             background: transparent;
             outline: none; 
             font-size: 0.95rem;
             color: var(--text-main);
-/* 入力欄は選択可能にする */
             -webkit-user-select: text;
             user-select: text;
-}
+        }
 
         select {
             background: #fcfcfc;
-border: 1px solid #eee;
+            border: 1px solid #eee;
             border-radius: 8px;
             font-size: 0.8rem;
             cursor: pointer;
             -webkit-appearance: none;
             appearance: none;
-}
+        }
 
-        input::placeholder { color: #ccc;
-}
+        input::placeholder { color: #ccc; }
 
         .add-btn { 
             background: var(--accent-color);
-color: white; 
+            color: white; 
             border: none; 
             padding: 0 20px; 
             border-radius: 8px; 
@@ -178,57 +147,37 @@ color: white;
             font-size: 14px;
             transition: all 0.3s;
             white-space: nowrap;
-}
-
-        .add-btn.wish { background: var(--text-sub);
-}
-        .add-btn.sub { background: #eee; color: var(--text-main); font-size: 11px; padding: 4px 10px;
-}
-
-        .add-btn:hover { 
-            opacity: 0.8;
-transform: translateY(-1px);
         }
 
-        .add-btn:disabled {
-            background: #ccc;
-cursor: not-allowed;
-        }
+        .add-btn.wish { background: var(--text-sub); }
+        .add-btn.sub { background: #eee; color: var(--text-main); font-size: 11px; padding: 4px 10px; }
+        .add-btn:hover { opacity: 0.8; transform: translateY(-1px); }
+        .add-btn:disabled { background: #ccc; cursor: not-allowed; }
 
-        /* リスト表示 */
-        #panel-list-container {
-            margin-bottom: 20px;
-}
+        #panel-list-container { margin-bottom: 20px; }
+        .panel-list { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 15px; }
 
-        .panel-list { 
-            display: grid;
-grid-template-columns: 1fr;
-            gap: 12px; 
-            margin-bottom: 15px;
-        }
-
-        /* タブメニューのスタイル */
         .wish-tabs, .group-tabs {
             display: flex;
-gap: 5px;
+            gap: 5px;
             margin-bottom: 15px;
             border-bottom: 1px solid #f0ede9;
             padding-bottom: 5px;
-            overflow-x: auto; /* グループが多い場合にスクロール */
+            overflow-x: auto;
             white-space: nowrap;
-}
+        }
         .group-tabs::-webkit-scrollbar { height: 2px; }
 
         .wish-tab, .group-tab {
             flex: 1;
-padding: 8px 5px;
+            padding: 8px 5px;
             font-size: 0.75rem;
             text-align: center;
             cursor: pointer;
             border-radius: 8px 8px 0 0;
             color: var(--text-sub);
             transition: all 0.2s;
-display: flex;
+            display: flex;
             flex-direction: column;
             align-items: center;
             gap: 2px;
@@ -237,60 +186,49 @@ display: flex;
 
         .wish-tab.active, .group-tab.active {
             background: #fdfaf9;
-color: var(--text-main);
+            color: var(--text-main);
             font-weight: bold;
             border-bottom: 2px solid var(--accent-color);
         }
 
         .tab-badge {
             font-size: 10px;
-background: #eee;
+            background: #eee;
             padding: 1px 6px;
             border-radius: 10px;
             color: var(--text-sub);
         }
-        .active .tab-badge {
-            background: var(--accent-color);
-color: white;
-        }
+        .active .tab-badge { background: var(--accent-color); color: white; }
 
-        /* 欲しいものリストをギャラリー表示に - 横2列に調整 */
-        #wish-list { 
-            display: flex;
-flex-wrap: wrap;
-            gap: 12px;
-        }
+        #wish-list { display: flex; flex-wrap: wrap; gap: 12px; }
 
         .panel-item { 
             display: flex;
-align-items: center; 
+            align-items: center; 
             background: #fff;
             border: 1px solid #f0ede9;
             border-radius: 12px;
             transition: all 0.2s ease;
             overflow: hidden;
-}
+        }
         
-        /* ギャラリー用のアイテム調整（2列・画像最大化） */
         #wish-list .panel-item {
             position: relative;
-flex-direction: column;
-            width: calc(50% - 6px); /* 2列表示 */
-            aspect-ratio: 1 / 1;
-/* 正方形に変更 */
+            flex-direction: column;
+            width: calc(50% - 6px);
+            aspect-ratio: 1 / 1.35; /* タイトル表示エリア分少し縦長に */
             padding: 0;
             box-sizing: border-box;
-}
+        }
 
         .panel-item:hover {
             border-color: var(--accent-color);
-box-shadow: 0 4px 12px rgba(212, 163, 115, 0.1);
+            box-shadow: 0 4px 12px rgba(212, 163, 115, 0.1);
         }
 
-        /* 左右ボタン形式のスタイル */
         .shop-btn {
             display: flex;
-align-items: center;
+            align-items: center;
             justify-content: center;
             width: 44px;
             height: 44px;
@@ -299,192 +237,97 @@ align-items: center;
             cursor: pointer;
             transition: all 0.2s;
             text-decoration: none;
-}
-
-        .color-dot {
-            width: 14px;
-height: 14px;
-            border-radius: 50%;
-            display: inline-block;
         }
-        .dot-animate { background-color: var(--animate-soft);
-}
-        .dot-gamers { background-color: var(--gamers-soft);
-}
 
-        .shop-btn:hover {
-            background: #fdfaf9;
-opacity: 0.7;
-        }
+        .color-dot { width: 14px; height: 14px; border-radius: 50%; display: inline-block; }
+        .dot-animate { background-color: var(--animate-soft); }
+        .dot-gamers { background-color: var(--gamers-soft); }
 
         .keyword-display {
-            flex: 1;
-text-align: left;
-            font-size: 0.95rem;
-            font-weight: 500;
-            color: var(--text-main);
-            padding: 12px 15px;
-/* タップしやすく調整 */
-            cursor: pointer;
-            -webkit-user-select: none;
-            user-select: none;
-}
-        .keyword-display:hover {
-            text-decoration: underline;
-}
-
-        /* ギャラリー用のサムネイル表示 */
-        .wish-thumb-container {
-            width: 100%;
-height: 100%;
-            text-decoration: none;
-            display: flex; /* 画像中央寄せのため追加 */
-            align-items: center;
-/* 画像中央寄せのため追加 */
-            justify-content: center;
-/* 画像中央寄せのため追加 */
-            overflow: hidden;
-            cursor: pointer;
-            position: relative;
-}
-
-        .wish-thumb {
-            width: 100%;
-height: 100%;
-            object-fit: contain; /* coverからcontainに変更（トリミングなし） */
-            background: #f9f9f9;
-display: block;
+            flex: 1; text-align: left; font-size: 0.95rem; font-weight: 500;
+            color: var(--text-main); padding: 12px 15px; cursor: pointer;
         }
+        .keyword-display:hover { text-decoration: underline; }
+
+        .wish-thumb-container {
+            width: 100%; height: 75%; /* 画像エリアを調整 */
+            text-decoration: none; display: flex; align-items: center; justify-content: center;
+            overflow: hidden; cursor: pointer; position: relative;
+        }
+
+        .wish-thumb { width: 100%; height: 100%; object-fit: contain; background: #f9f9f9; display: block; }
 
         /* 追加：情報オーバーレイ */
-        .wish-info-overlay {
-            position: absolute;
-bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(255, 255, 255, 0.85);
-            padding: 4px 6px;
-            font-size: 10px;
-            display: flex;
-            flex-direction: column;
-gap: 1px;
-            pointer-events: none;
+        .wish-tag-badge {
+            position: absolute; top: 4px; left: 4px; background: rgba(212, 163, 115, 0.9);
+            color: white; font-size: 9px; padding: 2px 6px; border-radius: 4px; pointer-events: none;
+            max-width: 80%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
-        .info-price { color: #d63031; font-weight: bold;
-}
-        .info-date { color: var(--text-main);
-}
+        .wish-date-label {
+            position: absolute; bottom: 4px; left: 4px; background: rgba(255,255,255,0.8);
+            color: var(--text-main); font-size: 9px; padding: 1px 4px; border-radius: 2px; pointer-events: none;
+        }
+        .wish-price-label {
+            position: absolute; bottom: 4px; right: 4px; background: rgba(255,255,255,0.8);
+            color: #d63031; font-size: 9px; font-weight: bold; padding: 1px 4px; border-radius: 2px; pointer-events: none;
+        }
+        .wish-title-area {
+            width: 100%; padding: 4px 6px; box-sizing: border-box;
+            font-size: 10px; color: var(--text-main); line-height: 1.2;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+            overflow: hidden; background: #fff; flex-grow: 1;
+        }
         
-        /* ギャラリー内の削除ボタン（右上に配置） */
         #wish-list .del-btn {
-            position: absolute;
-top: 0;
-            right: 0;
-            background: rgba(255, 255, 255, 0.8);
-            color: var(--text-sub);
-            width: 28px;
-            height: 28px;
-            font-size: 16px;
-            line-height: 28px;
-border: none;
-            border-bottom-left-radius: 8px;
-            z-index: 2;
+            position: absolute; top: 0; right: 0; background: rgba(255, 255, 255, 0.8);
+            color: var(--text-sub); width: 28px; height: 28px; font-size: 16px;
+            line-height: 28px; border: none; border-bottom-left-radius: 8px; z-index: 2;
         }
         
         .del-btn {
-            background: transparent;
-color: #ddd;
-            border: none;
-            width: 44px;
-            height: 44px;
-            cursor: pointer;
-            font-size: 18px;
-            transition: all 0.2s;
-            border-left: 1px solid #f8f8f8;
-}
-        
-        .del-btn:hover { 
-            background: #fff5f5;
-color: var(--delete-hover); 
+            background: transparent; color: #ddd; border: none; width: 44px; height: 44px;
+            cursor: pointer; font-size: 18px; transition: all 0.2s; border-left: 1px solid #f8f8f8;
         }
+        .del-btn:hover { background: #fff5f5; color: var(--delete-hover); }
 
-        /* --- モーダル共通 --- */
+        /* --- モーダル --- */
         .modal-overlay {
-            position: fixed;
-top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--overlay-bg);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            backdrop-filter: blur(4px);
-}
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--overlay-bg); display: none; justify-content: center;
+            align-items: center; z-index: 1000; backdrop-filter: blur(4px);
+        }
         .modal-content {
-            background: var(--card-bg);
-width: 90%;
-            max-width: 400px;
-            padding: 25px;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-}
+            background: var(--card-bg); width: 90%; max-width: 400px;
+            padding: 25px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            max-height: 90vh; overflow-y: auto;
+        }
         .modal-header {
-            font-size: 1.1rem;
-font-weight: 500;
-            margin-bottom: 20px;
-            color: var(--accent-color);
-            display: flex;
-            justify-content: space-between;
-}
-        .manage-list {
-            max-height: 300px;
-overflow-y: auto;
-            margin-bottom: 20px;
+            font-size: 1.1rem; font-weight: 500; margin-bottom: 20px;
+            color: var(--accent-color); display: flex; justify-content: space-between;
         }
+        .edit-form-group { margin-bottom: 15px; }
+        .edit-form-group label { display: block; font-size: 11px; color: var(--text-sub); margin-bottom: 5px; }
+        .edit-form-group input, .edit-form-group select {
+            width: 100%; border: 1px solid #eee; border-radius: 8px; padding: 10px; box-sizing: border-box;
+            background: #fcfcfc; font-size: 0.9rem;
+        }
+        .manage-list { max-height: 300px; overflow-y: auto; margin-bottom: 20px; }
         .manage-item {
-            display: flex;
-justify-content: space-between;
-            align-items: center;
-            padding: 12px;
-            border-bottom: 1px solid #eee;
-            cursor: pointer;
-            transition: background 0.2s;
-}
-        .manage-item:active {
-            background: #f9f9f9;
-}
-        .manage-item span { font-size: 0.9rem;
-}
-        .manage-item.selected {
-            background: #fdfaf9;
-border-left: 4px solid var(--accent-color);
-            font-weight: bold;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px; border-bottom: 1px solid #eee; cursor: pointer;
         }
-        .group-manage-del {
-            color: var(--delete-hover);
-font-size: 0.8rem;
-            cursor: pointer;
-            padding: 4px 8px;
-        }
-        .modal-footer {
-            display: flex;
-gap: 10px;
-            flex-direction: column;
-        }
+        .manage-item.selected { background: #fdfaf9; border-left: 4px solid var(--accent-color); font-weight: bold; }
+        .modal-footer { display: flex; gap: 10px; flex-direction: column; }
 
-        /* スクロールバーのカスタマイズ */
-        ::-webkit-scrollbar { width: 6px;
-}
-        ::-webkit-scrollbar-track { background: transparent;
-}
-        ::-webkit-scrollbar-thumb { background: #e0e0e0; border-radius: 10px;
-}
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #e0e0e0; border-radius: 10px; }
     </style>
 </head>
 <body>
 
     <div class="container">
         <h2>Favorite Collection</h2>
-        <p class="label">キーワード/画像をタップで編集・長押しで操作</p>
+        <p class="label">キーワード/画像をタップで検索・長押しで編集</p>
 
         <div class="section-title">
             Quick Search
@@ -492,9 +335,7 @@ gap: 10px;
         </div>
         
         <div class="input-group" style="margin-bottom: 0;">
-         
-
-   <input type="text" id="keyword-input" placeholder="検索ワードを追加...">
+            <input type="text" id="keyword-input" placeholder="検索ワードを追加...">
         </div>
         <div class="input-controls">
             <select id="group-select">
@@ -504,88 +345,89 @@ gap: 10px;
         </div>
 
         <div id="group-tabs-container" class="group-tabs"></div>
-
         <div id="panel-list-container"></div>
 
-    
-
-    <div class="section-title">Wish List</div>
+        <div class="section-title">Wish List</div>
         <div class="wish-input-container">
             <div class="input-group" style="margin-bottom: 0;">
                 <input type="text" id="wish-input" placeholder="商品のURLを貼り付け...">
             </div>
             <div class="wish-controls">
                 <select id="status-select">
-         
-
-           <option value="迷い中">迷い中</option>
+                    <option value="迷い中">迷い中</option>
                     <option value="購入・予約済">購入・予約済</option>
                     <option value="出たら買う">出たら買う</option>
                     <option value="やめた">やめた</option>
                 </select>
-         
-
-       <button id="wish-save-btn" class="add-btn wish" onclick="addWishItem()">保存</button>
+                <button id="wish-save-btn" class="add-btn wish" onclick="addWishItem()">保存</button>
             </div>
         </div>
 
         <div class="wish-tabs">
             <div class="wish-tab active" onclick="switchWishTab('迷い中')" id="tab-mayoi">
-                <span>迷い中</span>
-                <span class="tab-badge" id="badge-mayoi">0</span>
-          
-
-  </div>
+                <span>迷い中</span><span class="tab-badge" id="badge-mayoi">0</span>
+            </div>
             <div class="wish-tab" onclick="switchWishTab('購入・予約済')" id="tab-bought">
-                <span>購入・予約済</span>
-                <span class="tab-badge" id="badge-bought">0</span>
+                <span>購入・予約済</span><span class="tab-badge" id="badge-bought">0</span>
             </div>
             <div class="wish-tab" onclick="switchWishTab('出たら買う')" id="tab-future">
-                <span>出たら買う</span>
-      
-
-          <span class="tab-badge" id="badge-future">0</span>
+                <span>出たら買う</span><span class="tab-badge" id="badge-future">0</span>
             </div>
             <div class="wish-tab" onclick="switchWishTab('やめた')" id="tab-cancel">
-                <span>やめた</span>
-                <span class="tab-badge" id="badge-cancel">0</span>
+                <span>やめた</span><span class="tab-badge" id="badge-cancel">0</span>
             </div>
         </div>
-
-       
-
- <div id="wish-list"></div>
+        <div id="wish-list"></div>
     </div>
 
     <div id="group-modal" class="modal-overlay" onclick="closeGroupModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-header">
-                グループ管理
-                <span style="cursor:pointer;
-color:#ccc;" onclick="closeGroupModal()">&times;</span>
-            </div>
+            <div class="modal-header">グループ管理<span style="cursor:pointer;color:#ccc;" onclick="closeGroupModal()">&times;</span></div>
             <div class="manage-list" id="modal-group-list"></div>
             <div class="modal-footer">
                 <div class="input-group">
                     <input type="text" id="new-group-name" placeholder="新しいグループ名...">
-                    
-<button class="add-btn" onclick="addNewGroup()">追加</button>
+                    <button class="add-btn" onclick="addNewGroup()">追加</button>
                 </div>
-                <button class="add-btn sub" style="width:100%;
-margin-top:10px;" onclick="closeGroupModal()">閉じる</button>
+                <button class="add-btn sub" style="width:100%;margin-top:10px;" onclick="closeGroupModal()">閉じる</button>
             </div>
         </div>
     </div>
 
     <div id="status-modal" class="modal-overlay" onclick="closeStatusModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-header">
-                ステータスの変更
-                <span style="cursor:pointer;
-color:#ccc;" onclick="closeStatusModal()">&times;</span>
+            <div class="modal-header">アイテムの編集<span style="cursor:pointer;color:#ccc;" onclick="closeStatusModal()">&times;</span></div>
+            
+            <div class="edit-form-group">
+                <label>タイトル</label>
+                <input type="text" id="edit-wish-title" placeholder="商品名">
             </div>
-            <div class="manage-list" id="modal-status-list"></div>
+            <div class="edit-form-group">
+                <label>ステータス</label>
+                <select id="edit-wish-status">
+                    <option value="迷い中">迷い中</option>
+                    <option value="購入・予約済">購入・予約済</option>
+                    <option value="出たら買う">出たら買う</option>
+                    <option value="やめた">やめた</option>
+                </select>
+            </div>
+            <div class="edit-form-group" style="display:flex; gap:10px;">
+                <div style="flex:1;">
+                    <label>発売日</label>
+                    <input type="text" id="edit-wish-date" placeholder="例: 2024/05">
+                </div>
+                <div style="flex:1;">
+                    <label>価格</label>
+                    <input type="text" id="edit-wish-price" placeholder="例: ¥880">
+                </div>
+            </div>
+            <div class="edit-form-group">
+                <label>タグ</label>
+                <input type="text" id="edit-wish-tag" placeholder="ジャンルやキャラ名など">
+            </div>
+
             <div class="modal-footer">
+                <button class="add-btn" style="width:100%;" onclick="saveWishEdit()">保存する</button>
                 <button class="add-btn sub" style="width:100%;" onclick="closeStatusModal()">キャンセル</button>
             </div>
         </div>
@@ -593,41 +435,42 @@ color:#ccc;" onclick="closeStatusModal()">&times;</span>
 
     <script>
         const STORAGE_KEY = 'animate_search_keywords_v2';
- 
-       const GROUP_STORAGE_KEY = 'animate_groups_v1';
+        const GROUP_STORAGE_KEY = 'animate_groups_v1';
         const WISH_STORAGE_KEY = 'animate_wish_list_v2'; 
         const ANIMATE_URL = 'https://www.animate-onlineshop.jp/products/list.php?smt=';
         const GAMERS_URL = 'https://www.gamers.co.jp/products/list.php?smt=';
 
         let currentWishTab = '迷い中';
-        let currentGroupTab = '未分類'; // 現在選択されているグループタブ
+        let currentGroupTab = '未分類';
         let longPressTimer;
         let isLongPress = false;
-        let editingWishIndex = null; // ステータス編集中のインデックス保持
+        let editingWishIndex = null; 
+        
+        let touchStartX = 0;
+        let touchStartY = 0;
 
-        window.onload = () => 
-{ 
+        window.onload = () => { 
             updateGroupSelect();
-            loadPanels(); 
+            loadPanels();
             loadWishItems();
         };
-// --- グループ管理機能 ---
+
+        // --- グループ管理機能 ---
         function getGroups() {
-     
-       const data = localStorage.getItem(GROUP_STORAGE_KEY);
-return data ? JSON.parse(data) : ["毎日", "ジャンル名", "今やってるやつ"];
+            const data = localStorage.getItem(GROUP_STORAGE_KEY);
+            return data ? JSON.parse(data) : ["毎日", "ジャンル名", "今やってるやつ"];
         }
 
         function saveGroups(groups) {
             localStorage.setItem(GROUP_STORAGE_KEY, JSON.stringify(groups));
-updateGroupSelect();
+            updateGroupSelect();
             loadPanels();
             renderModalGroups();
         }
 
         function updateGroupSelect() {
             const select = document.getElementById('group-select');
-const groups = getGroups();
+            const groups = getGroups();
             select.innerHTML = '<option value="未分類">グループ未指定</option>';
             groups.forEach(g => {
                 const opt = document.createElement('option');
@@ -635,41 +478,36 @@ const groups = getGroups();
                 opt.textContent = g;
                 select.appendChild(opt);
             });
-}
+        }
 
         function openGroupModal() {
             document.getElementById('group-modal').style.display = 'flex';
-renderModalGroups();
+            renderModalGroups();
         }
 
         function closeGroupModal() {
             document.getElementById('group-modal').style.display = 'none';
-}
+        }
 
         function renderModalGroups() {
             const list = document.getElementById('modal-group-list');
-const groups = getGroups();
+            const groups = getGroups();
             list.innerHTML = '';
             groups.forEach(g => {
                 const div = document.createElement('div');
                 div.className = 'manage-item';
-                div.innerHTML = `
-                    <span>${g}</span>
-                
-
-    <span class="group-manage-del" onclick="event.stopPropagation(); removeGroup('${g}')">削除</span>
-                `;
+                div.innerHTML = `<span>${g}</span><span class="group-manage-del" onclick="event.stopPropagation(); removeGroup('${g}')">削除</span>`;
                 list.appendChild(div);
             });
-}
+        }
 
         function addNewGroup() {
             const input = document.getElementById('new-group-name');
-const name = input.value.trim();
+            const name = input.value.trim();
             const groups = getGroups();
             if (name && !groups.includes(name)) {
                 groups.push(name);
-saveGroups(groups);
+                saveGroups(groups);
                 input.value = '';
             }
         }
@@ -677,19 +515,16 @@ saveGroups(groups);
         function removeGroup(groupToDelete) {
             if (confirm(`グループ「${groupToDelete}」を削除しますか？\n(中のキーワードは「未分類」に移動します)`)) {
                 const groups = getGroups();
-const newGroups = groups.filter(g => g !== groupToDelete);
-                
+                const newGroups = groups.filter(g => g !== groupToDelete);
                 const keywords = getKeywords();
-keywords.forEach(k => {
-                    if (k.group === groupToDelete) k.group = "未分類";
-                });
-saveKeywords(keywords);
+                keywords.forEach(k => { if (k.group === groupToDelete) k.group = "未分類"; });
+                saveKeywords(keywords);
                 saveGroups(newGroups);
                 if (currentGroupTab === groupToDelete) currentGroupTab = '未分類';
             }
         }
 
-        // --- 検索パネル機能（タブ切り替え対応） ---
+        // --- 検索パネル機能 ---
         function switchGroupTab(groupName) {
             currentGroupTab = groupName;
             loadPanels();
@@ -698,287 +533,216 @@ saveKeywords(keywords);
         function loadPanels() {
             const container = document.getElementById('panel-list-container');
             const tabsContainer = document.getElementById('group-tabs-container');
-container.innerHTML = '';
+            container.innerHTML = '';
             tabsContainer.innerHTML = '';
             
             const keywords = getKeywords();
             const groups = ["未分類", ...getGroups()];
-
-            // タブの生成
             groups.forEach(groupName => {
                 const groupKeywordsCount = keywords.filter(k => (k.group || "未分類") === groupName).length;
                 if (groupKeywordsCount === 0 && groupName === "未分類") return;
-
                 const tab = document.createElement('div');
                 tab.className = `group-tab ${currentGroupTab === groupName ? 'active' : ''}`;
                 tab.onclick = () => switchGroupTab(groupName);
-                tab.innerHTML = `
-                    <span>${groupName}</span>
-                    <span class="tab-badge">${groupKeywordsCount}</span>
-                `;
+                tab.innerHTML = `<span>${groupName}</span><span class="tab-badge">${groupKeywordsCount}</span>`;
                 tabsContainer.appendChild(tab);
             });
 
-            // 選択中グループのキーワードを表示
-const groupKeywords = keywords.filter(k => (k.group || "未分類") === currentGroupTab);
-            
+            const groupKeywords = keywords.filter(k => (k.group || "未分類") === currentGroupTab);
             if (groupKeywords.length > 0) {
                 const listDiv = document.createElement('div');
                 listDiv.className = 'panel-list';
-
                 groupKeywords.forEach((item) => {
                     const div = document.createElement('div');
-                
-
-    div.className = 'panel-item';
+                    div.className = 'panel-item';
                     const word = typeof item === 'string' ? item : item.word;
                     const encodedWord = encodeURIComponent(word);
                     const originalIndex = keywords.indexOf(item);
-                  
-
-  
                     div.innerHTML = `
                         <div class="keyword-display" 
-                             onmousedown="startLongPress(${originalIndex}, 'panel')" 
-                   
-
-          onmouseup="cancelLongPress(${originalIndex}, 'panel')" 
-                             onmouseleave="cancelLongPress()"
-                             ontouchstart="startLongPress(${originalIndex}, 'panel')" 
-                            
-
- ontouchend="cancelLongPress(${originalIndex}, 'panel')"
-                             oncontextmenu="return false;">
-                             ${word}
-                        </div>
-               
-
-         <a href="${ANIMATE_URL}${encodedWord}" target="_blank" class="shop-btn" title="アニメイトで検索">
-                            <span class="color-dot dot-animate"></span>
-                        </a>
-                        <a href="${GAMERS_URL}${encodedWord}" target="_blank" class="shop-btn" title="ゲーマーズで検索">
-     
-
-                       <span class="color-dot dot-gamers"></span>
-                        </a>
+                             onmousedown="startLongPress(event, ${originalIndex}, 'panel')" 
+                             onmouseup="cancelLongPress(event, ${originalIndex}, 'panel')" 
+                             ontouchstart="startLongPress(event, ${originalIndex}, 'panel')" 
+                             ontouchend="cancelLongPress(event, ${originalIndex}, 'panel')"
+                             oncontextmenu="return false;">${word}</div>
+                        <a href="${ANIMATE_URL}${encodedWord}" target="_blank" class="shop-btn"><span class="color-dot dot-animate"></span></a>
+                        <a href="${GAMERS_URL}${encodedWord}" target="_blank" class="shop-btn"><span class="color-dot dot-gamers"></span></a>
                     `;
-listDiv.appendChild(div);
+                    listDiv.appendChild(div);
                 });
-container.appendChild(listDiv);
+                container.appendChild(listDiv);
             } else {
                 container.innerHTML = `<p style="text-align:center; color:var(--text-sub); font-size:0.8rem; margin-top:20px;">このグループにはキーワードがありません</p>`;
             }
-}
+        }
 
-        // 長押し処理の共通化
-        function startLongPress(index, type) {
+        function startLongPress(event, index, type) {
             isLongPress = false;
-longPressTimer = setTimeout(() => {
+            if (event.touches) {
+                touchStartX = event.touches[0].clientX;
+                touchStartY = event.touches[0].clientY;
+            }
+            longPressTimer = setTimeout(() => {
                 isLongPress = true;
                 longPressTimer = null;
-                if (type === 'panel') {
-                    confirmDelete(index);
-                } else if (type 
-=== 'wish') {
-                    openStatusModal(index);
-                }
+                if (type === 'panel') confirmDelete(index);
+                else if (type === 'wish') openStatusModal(index);
             }, 700);
-}
+        }
 
-        function cancelLongPress(index, type) {
+        function cancelLongPress(event, index, type) {
             if (longPressTimer) {
                 clearTimeout(longPressTimer);
-longPressTimer = null;
+                longPressTimer = null;
                 if (!isLongPress && index !== undefined) {
-                    if (type === 'panel') {
-                        editPanel(index);
-}
+                    let moveX = 0, moveY = 0;
+                    if (event && event.changedTouches) {
+                        moveX = Math.abs(event.changedTouches[0].clientX - touchStartX);
+                        moveY = Math.abs(event.changedTouches[0].clientY - touchStartY);
+                    }
+                    if (moveX < 10 && moveY < 10) {
+                        if (type === 'panel') editPanel(index);
+                    }
                 }
             }
         }
 
         function handleWishClick(event) {
-            // 長押し発生時は遷移させない
             if (isLongPress) {
                 event.preventDefault();
-isLongPress = false;
+                isLongPress = false;
             }
         }
 
         function confirmDelete(index) {
             const keywords = getKeywords();
-const word = keywords[index].word;
-            if (confirm(`キーワード「${word}」を削除しますか？`)) {
-                deletePanel(index);
-}
+            if (confirm(`キーワード「${keywords[index].word}」を削除しますか？`)) deletePanel(index);
         }
 
         function addPanel() {
             const input = document.getElementById('keyword-input');
-const groupSelect = document.getElementById('group-select');
+            const groupSelect = document.getElementById('group-select');
             const word = input.value.trim();
-            const group = groupSelect.value;
-if (word) {
+            if (word) {
                 const keywords = getKeywords();
-keywords.unshift({ word: word, group: group });
+                keywords.unshift({ word: word, group: groupSelect.value });
                 saveKeywords(keywords);
                 input.value = '';
-                currentGroupTab = group; // 追加したグループに自動で切り替え
+                currentGroupTab = groupSelect.value;
                 loadPanels();
-}
+            }
         }
 
         function editPanel(index) {
             const keywords = getKeywords();
-const item = keywords[index];
+            const item = keywords[index];
             const newWord = prompt("検索キーワードを修正:", item.word);
-            
             if (newWord !== null && newWord.trim() !== "") {
                 const groups = ["未分類", ...getGroups()];
-const groupListText = groups.map((g, i) => `${i}: ${g}`).join("\n");
+                const groupListText = groups.map((g, i) => `${i}: ${g}`).join("\n");
                 const groupIndex = prompt(`移動先のグループ番号を入力してください:\n${groupListText}`, groups.indexOf(item.group || "未分類"));
-                
                 item.word = newWord.trim();
-if (groupIndex !== null && groups[groupIndex]) {
+                if (groupIndex !== null && groups[groupIndex]) {
                     item.group = groups[groupIndex];
-                    currentGroupTab = item.group; // 移動先へタブを切り替え
-}
-                
+                    currentGroupTab = item.group;
+                }
                 saveKeywords(keywords);
-loadPanels();
+                loadPanels();
             }
         }
 
         function deletePanel(index) {
             const keywords = getKeywords();
-keywords.splice(index, 1);
+            keywords.splice(index, 1);
             saveKeywords(keywords);
             loadPanels();
         }
 
         function getKeywords() {
             const data = localStorage.getItem(STORAGE_KEY);
-let keywords = data ? JSON.parse(data) : [
-                {word: "クリアファイル", group: "未分類"}, 
-                {word: "ラブライブ", group: "未分類"}, 
-                {word: "有馬かな", group: "未分類"}
-            ];
-return keywords.map(k => typeof k === 'string' ? { word: k, group: "未分類" } : k);
-}
+            let keywords = data ? JSON.parse(data) : [{word: "クリアファイル", group: "未分類"}];
+            return keywords.map(k => typeof k === 'string' ? { word: k, group: "未分類" } : k);
+        }
 
-        function saveKeywords(keywords) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(keywords));
-}
+        function saveKeywords(keywords) { localStorage.setItem(STORAGE_KEY, JSON.stringify(keywords)); }
 
         // --- 欲しいものリスト機能 ---
         function switchWishTab(status) {
             currentWishTab = status;
-document.querySelectorAll('.wish-tab').forEach(t => t.classList.remove('active'));
-            if (status === '迷い中') document.getElementById('tab-mayoi').classList.add('active');
-            if (status === '購入・予約済') document.getElementById('tab-bought').classList.add('active');
-            if (status === '出たら買う') document.getElementById('tab-future').classList.add('active');
-if (status === 'やめた') document.getElementById('tab-cancel').classList.add('active');
-            
+            document.querySelectorAll('.wish-tab').forEach(t => t.classList.remove('active'));
+            const map = {'迷い中': 'tab-mayoi', '購入・予約済': 'tab-bought', '出たら買う': 'tab-future', 'やめた': 'tab-cancel'};
+            if(map[status]) document.getElementById(map[status]).classList.add('active');
             loadWishItems();
         }
 
         function loadWishItems() {
             const list = document.getElementById('wish-list');
-list.innerHTML = '';
+            list.innerHTML = '';
             const allItems = getWishItems();
-
             const counts = { '迷い中': 0, '購入・予約済': 0, '出たら買う': 0, 'やめた': 0 };
-allItems.forEach(item => {
-                if (counts.hasOwnProperty(item.status)) { counts[item.status]++; } 
-                else { counts['迷い中']++; }
-            });
-document.getElementById('badge-mayoi').textContent = counts['迷い中'];
+            allItems.forEach(item => { if (counts.hasOwnProperty(item.status)) counts[item.status]++; else counts['迷い中']++; });
+            document.getElementById('badge-mayoi').textContent = counts['迷い中'];
             document.getElementById('badge-bought').textContent = counts['購入・予約済'];
             document.getElementById('badge-future').textContent = counts['出たら買う'];
             document.getElementById('badge-cancel').textContent = counts['やめた'];
-const filteredItems = allItems.filter(item => (item.status || '迷い中') === currentWishTab);
-filteredItems.forEach((item) => {
+
+            const filteredItems = allItems.filter(item => (item.status || '迷い中') === currentWishTab);
+            filteredItems.forEach((item) => {
                 const originalIndex = allItems.indexOf(item);
                 const div = document.createElement('div');
                 div.className = 'panel-item';
-                
                 const fallbackIcon = `https://www.google.com/s2/favicons?sz=128&domain=${new URL(item.url).hostname}`;
-      
-
-          const thumbUrl = item.image || fallbackIcon;
-
-                // 金額と日付の表示用HTML
-                let infoHtml = '';
-                if (item.price || item.releaseDate) {
-                    infoHtml = `
-       
-
-                 <div class="wish-info-overlay">
-                            ${item.price ? `<span class="info-price">${item.price}</span>` : ''}
-                            ${item.releaseDate ? `<span class="info-date">${item.releaseDate}</span>` : ''}
-                
-
-        </div>
-                    `;
-                }
+                const thumbUrl = item.image || fallbackIcon;
 
                 div.innerHTML = `
                     <a class="wish-thumb-container" href="${item.url}" target="_blank" 
-              
-
-         onclick="handleWishClick(event)"
-                       onmousedown="startLongPress(${originalIndex}, 'wish')" 
-                       onmouseup="cancelLongPress(${originalIndex}, 'wish')" 
-                       onmouseleave="cancelLongPress()"
-                  
-
-     ontouchstart="startLongPress(${originalIndex}, 'wish')" 
-                       ontouchend="cancelLongPress(${originalIndex}, 'wish')"
+                       onclick="handleWishClick(event)"
+                       onmousedown="startLongPress(event, ${originalIndex}, 'wish')" 
+                       onmouseup="cancelLongPress(event, ${originalIndex}, 'wish')" 
+                       ontouchstart="startLongPress(event, ${originalIndex}, 'wish')" 
+                       ontouchend="cancelLongPress(event, ${originalIndex}, 'wish')"
                        oncontextmenu="return false;">
-                        <img src="${thumbUrl}" class="wish-thumb" alt="thumb" onerror="this.src='${fallbackIcon}'">
-                 
-
-       ${infoHtml}
+                        <img src="${thumbUrl}" class="wish-thumb" onerror="this.src='${fallbackIcon}'">
+                        ${item.tags ? `<div class="wish-tag-badge">${item.tags}</div>` : ''}
+                        ${item.releaseDate ? `<div class="wish-date-label">${item.releaseDate}</div>` : ''}
+                        ${item.price ? `<div class="wish-price-label">${item.price}</div>` : ''}
                     </a>
+                    <div class="wish-title-area">${item.title || '無題のアイテム'}</div>
                     <button class="del-btn" onclick="deleteWishItem(${originalIndex})" title="削除">×</button>
                 `;
-list.appendChild(div);
+                list.appendChild(div);
             });
         }
 
-        // --- ステータス編集モーダル機能 (新規) ---
+        // --- アイテム編集モーダル機能 ---
         function openStatusModal(index) {
             editingWishIndex = index;
-document.getElementById('status-modal').style.display = 'flex';
-            renderModalStatus();
+            const items = getWishItems();
+            const item = items[index];
+            
+            document.getElementById('edit-wish-title').value = item.title || "";
+            document.getElementById('edit-wish-status').value = item.status || "迷い中";
+            document.getElementById('edit-wish-date').value = item.releaseDate || "";
+            document.getElementById('edit-wish-price').value = item.price || "";
+            document.getElementById('edit-wish-tag').value = item.tags || "";
+            
+            document.getElementById('status-modal').style.display = 'flex';
         }
 
         function closeStatusModal() {
             document.getElementById('status-modal').style.display = 'none';
-editingWishIndex = null;
+            editingWishIndex = null;
         }
 
-        function renderModalStatus() {
-            const list = document.getElementById('modal-status-list');
-const items = getWishItems();
-            const currentStatus = items[editingWishIndex].status || '迷い中';
-            const statusOptions = ['迷い中', '購入・予約済', '出たら買う', 'やめた'];
-            
-            list.innerHTML = '';
-statusOptions.forEach(status => {
-                const div = document.createElement('div');
-                div.className = `manage-item ${status === currentStatus ? 'selected' : ''}`;
-                div.innerHTML = `<span>${status}</span>`;
-                div.onclick = () => updateWishStatus(status);
-                
-list.appendChild(div);
-            });
-}
-
-        function updateWishStatus(newStatus) {
+        function saveWishEdit() {
             if (editingWishIndex !== null) {
                 const items = getWishItems();
-items[editingWishIndex].status = newStatus;
+                items[editingWishIndex].title = document.getElementById('edit-wish-title').value.trim();
+                items[editingWishIndex].status = document.getElementById('edit-wish-status').value;
+                items[editingWishIndex].releaseDate = document.getElementById('edit-wish-date').value.trim();
+                items[editingWishIndex].price = document.getElementById('edit-wish-price').value.trim();
+                items[editingWishIndex].tags = document.getElementById('edit-wish-tag').value.trim();
+                
                 localStorage.setItem(WISH_STORAGE_KEY, JSON.stringify(items));
                 closeStatusModal();
                 loadWishItems();
@@ -987,81 +751,57 @@ items[editingWishIndex].status = newStatus;
 
         async function addWishItem() {
             const input = document.getElementById('wish-input');
-const statusSelect = document.getElementById('status-select');
+            const statusSelect = document.getElementById('status-select');
             const btn = document.getElementById('wish-save-btn');
             const url = input.value.trim();
-            const status = statusSelect.value;
-if (url && (url.startsWith('http'))) {
+            if (url && (url.startsWith('http'))) {
                 btn.disabled = true;
-btn.innerText = "取得中...";
-
+                btn.innerText = "取得中...";
                 try {
                     const response = await fetch(`https://api.microlink.io?url=${encodeURIComponent(url)}`);
-const data = await response.json();
-                    
-                    // 金額の抽出 (APIから取得できる可能性のあるフィールド)
-                    let price = null;
-if (data.data.price) {
-                        price = data.data.price;
-}
-
-                    // 発売日の抽出 (説明文などから日付っぽい文字列を探す簡易的な処理)
-                    let releaseDate = null;
-const desc = data.data.description || "";
-                    const dateMatch = desc.match(/(\d{4}[\/\-年]\d{1,2}[\/\-月]\d{1,2}日?)/);
-if (dateMatch) {
-                        releaseDate = dateMatch[0];
-}
-
+                    const data = await response.json();
                     const newItem = {
                         url: url,
-                        title: data.data.title ||
-"商品ページ",
-                        image: data.data.image ?
-data.data.image.url : null,
-                        status: status,
-                        price: price, // 追加
-                        releaseDate: releaseDate // 追加
-                   
-
- };
+                        title: data.data.title || "商品ページ",
+                        image: data.data.image ? data.data.image.url : null,
+                        status: statusSelect.value,
+                        releaseDate: "",
+                        price: "",
+                        tags: ""
+                    };
                     const items = getWishItems();
                     items.unshift(newItem);
                     localStorage.setItem(WISH_STORAGE_KEY, JSON.stringify(items));
                     input.value = '';
-                    switchWishTab(status);
-} catch (error) {
+                    switchWishTab(statusSelect.value);
+                } catch (error) {
                     const items = getWishItems();
-items.unshift({ url: url, title: "URLのみ保存", image: null, status: status, price: null, releaseDate: null });
+                    items.unshift({ url: url, title: "URLのみ保存", image: null, status: statusSelect.value, releaseDate: "", price: "", tags: "" });
                     localStorage.setItem(WISH_STORAGE_KEY, JSON.stringify(items));
-                    switchWishTab(status);
-} finally {
+                    switchWishTab(statusSelect.value);
+                } finally {
                     btn.disabled = false;
-btn.innerText = "保存";
+                    btn.innerText = "保存";
                 }
             }
         }
 
         function deleteWishItem(index) {
             const items = getWishItems();
-if (confirm("このアイテムを削除しますか？")) {
+            if (confirm("このアイテムを削除しますか？")) {
                 items.splice(index, 1);
-localStorage.setItem(WISH_STORAGE_KEY, JSON.stringify(items));
+                localStorage.setItem(WISH_STORAGE_KEY, JSON.stringify(items));
                 loadWishItems();
             }
         }
 
         function getWishItems() {
             const data = localStorage.getItem(WISH_STORAGE_KEY);
-return data ? JSON.parse(data) : [];
+            return data ? JSON.parse(data) : [];
         }
 
-        document.getElementById('keyword-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') addPanel();
-        });
-document.getElementById('wish-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') addWishItem();
-        });
-</script>
+        document.getElementById('keyword-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') addPanel(); });
+        document.getElementById('wish-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') addWishItem(); });
+    </script>
 </body>
 </html>
