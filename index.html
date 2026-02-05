@@ -141,7 +141,9 @@
             box-shadow: 0 2px 8px rgba(229, 152, 155, 0.3);
         }
 
-        #wish-list { display: flex; flex-wrap: wrap; gap: 12px; }
+        #wish-list.panel-list { display: grid !important; 
+    grid-template-columns: 1fr 1fr !important; /* ここで2列を指定 */
+    gap: 12px; }
 
         .panel-item { 
             display: flex; align-items: center; background: #fff;
@@ -156,8 +158,10 @@
         }
         
         #wish-list .panel-item {
-            position: relative; flex-direction: column;
-            width: calc(50% - 6px); aspect-ratio: 1 / 1.35;
+            position: relative; 
+    flex-direction: column; 
+    width: 100% !important; /* グリッドの枠いっぱいに広げる */
+    aspect-ratio: 1 / 1.35;
         }
 
         .shop-btn {
