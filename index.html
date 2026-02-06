@@ -128,7 +128,7 @@
         .active .tab-badge { background: var(--accent-color); color: white; }
 
         /* タグチップ用のスタイル */
-        .filter-tags-container {
+        .filter-tags-container, .modal-tags-container {
             display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px;
         }
         .tag-chip {
@@ -140,10 +140,16 @@
             background: var(--accent-color); color: white;
             box-shadow: 0 2px 8px rgba(229, 152, 155, 0.3);
         }
+        .modal-tag-chip {
+            padding: 4px 10px; border-radius: 6px; background: #f7eded;
+            font-size: 10px; color: var(--text-main); cursor: pointer;
+        }
 
-        #wish-list.panel-list { display: grid !important; 
-    grid-template-columns: 1fr 1fr !important; /* ここで2列を指定 */
-    gap: 12px; }
+        #wish-list.panel-list { 
+            display: flex !important;
+            flex-direction: column !important; /* 縦に並べる */
+            gap: 16px; /* アイテム間の余白を少し広げる */
+        }
 
         .panel-item { 
             display: flex; align-items: center; background: #fff;
@@ -158,10 +164,11 @@
         }
         
         #wish-list .panel-item {
-            position: relative; 
-    flex-direction: column; 
-    width: 100% !important; /* グリッドの枠いっぱいに広げる */
-    aspect-ratio: 1 / 1.35;
+            position: relative;
+            flex-direction: row; /* 画像とテキストを横に並べる場合 */
+            width: 100% !important;
+            height: 120px; /* 高さを固定してコンパクトに */
+            aspect-ratio: auto; /* 比率固定を解除 */
         }
 
         .shop-btn {
@@ -266,7 +273,7 @@
         <div id="group-tabs-container" class="group-tabs"></div>
         <div id="panel-list-container"></div>
 
-        <div class="section-title">Wish List</div>
+        <div class="section-title" id="wish-list-section">Wish List</div>
         <div class="input-group">
             <input type="text" id="wish-input" placeholder="商品のURLを貼り付け...">
             <button id="wish-save-btn" class="add-btn wish" onclick="addWishItem()">保存</button>
@@ -339,8 +346,9 @@
                 </div>
             </div>
             <div class="edit-form-group">
-                <label>タグ</label>
+                <label>タグ (直接入力または下のチップを選択)</label>
                 <input type="text" id="edit-wish-tag">
+                <div id="modal-tag-chips" class="modal-tags-container" style="margin-top:8px;"></div>
             </div>
             <button class="add-btn" style="width:100%; padding:12px;" onclick="saveWishEdit()">保存する</button>
         </div>
@@ -357,19 +365,21 @@
                 animate: 'https://www.animate-onlineshop.jp/products/list.php?smt=',
                 gamers: 'https://www.gamers.co.jp/products/list.php?smt='
             },
-            longPressDuration: 600 // 少し短くして反応を良くする
+            longPressDuration: 600
         };
 
         let state = {
             currentWishTab: '迷い中',
             currentGroupTab: '未分類',
-            currentWishTagFilter: null, // 追加: 現在選択中のタグ
+            currentWishTagFilter: null,
+            currentSearchFilter: null, // ① 追加: 検索ワードによるフィルタ
             editingWishIndex: null,
             pressTimer: null,
             isLongPress: false,
             touchPos: { x: 0, y: 0 },
-            isScrolling: false, // スクロール判定用
-            isTouchDevice: false // タッチデバイス判定用
+            isScrolling: false,
+            isTouchDevice: false,
+            preventNextClick: false // 追加: モーダル誤爆防止用フラグ
         };
 
         // --- Data Access Helpers ---
@@ -386,7 +396,6 @@
         };
 
         window.onload = () => { 
-            // タッチ対応判定
             window.addEventListener('touchstart', function() {
                 state.isTouchDevice = true;
             }, {passive: true, once: true});
@@ -402,6 +411,7 @@
         function toggleModal(id, show) {
             document.getElementById(id).style.display = show ? 'flex' : 'none';
             if(id === 'group-modal' && show) renderModalGroups();
+            if(id === 'status-modal' && show) renderModalTagChips();
         }
 
         // --- Group Management ---
@@ -475,9 +485,9 @@
             container.innerHTML = `<div class="panel-list">${filtered.map(item => {
                 const idx = keywords.indexOf(item);
                 const enc = encodeURIComponent(item.word);
-                // システムメニュー（コンテキストメニュー）を抑制
+                const isActive = state.currentSearchFilter === item.word;
                 return `
-                    <div class="panel-item" oncontextmenu="return false;">
+                    <div class="panel-item ${isActive ? 'active' : ''}" oncontextmenu="return false;" style="${isActive ? 'border-color:var(--accent-color); background:var(--primary-bg);' : ''}">
                         <div class="keyword-display" 
                              onmousedown="if(!state.isTouchDevice) handlePressStart(event, ${idx}, 'panel')" 
                              onmouseup="if(!state.isTouchDevice) handlePressEnd(event, ${idx}, 'panel')" 
@@ -507,39 +517,64 @@
         // --- Wish List ---
         function switchWishTab(s) {
             state.currentWishTab = s;
-            state.currentWishTagFilter = null; // タブ切り替え時にフィルター解除
+            // タグ絞り込みは解除せず、引き継ぐように修正
             document.querySelectorAll('.wish-tab').forEach(t => {
                 t.classList.toggle('active', t.innerText.includes(s));
             });
             renderWishItems();
         }
 
-        // タグフィルター切り替え用
         function toggleTagFilter(tag) {
             state.currentWishTagFilter = (state.currentWishTagFilter === tag) ? null : tag;
-            renderWishItems(false); // counts更新は不要なのでfalse
+            renderWishItems(); // タブ件数も変わるため true（デフォルト）
         }
 
-        function renderWishItems(updateCounts = true) {
+        // ② & ③ 追加: キーワード絞り込みとスクロール
+        function applyKeywordFilter(word) {
+            state.currentSearchFilter = (state.currentSearchFilter === word) ? null : word;
+            renderPanels(); // パネル側の見た目も更新
+            renderWishItems();
+            
+            // スクロール処理
+            const section = document.getElementById('wish-list-section');
+            if(section) {
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        function renderWishItems() {
             const list = document.getElementById('wish-list');
             const tagContainer = document.getElementById('filter-tags');
             const all = db.getWishItems();
             
-            // 1. 各タブの件数計算
-            if(updateCounts) {
-                const counts = { '迷い中': 0, '購入・予約済': 0, '出たら買う': 0, 'やめた': 0 };
-                all.forEach(item => counts[item.status || '迷い中']++);
-                Object.keys(counts).forEach(k => {
-                    const badgeId = { '迷い中':'badge-mayoi', '購入・予約済':'badge-bought', '出たら買う':'badge-future', 'やめた':'badge-cancel' }[k];
-                    document.getElementById(badgeId).textContent = counts[k];
-                });
-            }
+            // ① 検索ワードフィルタリングのロジック追加
+            const matchesSearch = (item) => {
+                if (!state.currentSearchFilter) return true;
+                const searchLower = state.currentSearchFilter.toLowerCase();
+                return (item.title && item.title.toLowerCase().includes(searchLower)) || 
+                       (item.tags && item.tags.toLowerCase().includes(searchLower));
+            };
 
-            // 2. ステータスでフィルタ
+            // バッジの計算：タグ絞り込み + 検索フィルタがある場合は、その条件に合うものだけを各タブでカウント
+            const counts = { '迷い中': 0, '購入・予約済': 0, '出たら買う': 0, 'やめた': 0 };
+            all.forEach(item => {
+                const status = item.status || '迷い中';
+                const tagMatch = !state.currentWishTagFilter || item.tags === state.currentWishTagFilter;
+                const searchMatch = matchesSearch(item);
+                if (tagMatch && searchMatch) {
+                    counts[status]++;
+                }
+            });
+            Object.keys(counts).forEach(k => {
+                const badgeId = { '迷い中':'badge-mayoi', '購入・予約済':'badge-bought', '出たら買う':'badge-future', 'やめた':'badge-cancel' }[k];
+                document.getElementById(badgeId).textContent = counts[k];
+            });
+
+            // 表示するアイテムのフィルタリング
             let filtered = all.filter(item => (item.status || '迷い中') === state.currentWishTab);
 
-            // 3. 利用可能なタグの抽出と描画（現在のタブ内にあるタグのみ）
-            const availableTags = [...new Set(filtered.map(item => item.tags).filter(t => t && t.trim() !== ""))];
+            // 全体のタグリスト取得（チップ表示用。絞り込みに関係なく全アイテムからユニークなタグを抽出）
+            const availableTags = [...new Set(all.map(item => item.tags).filter(t => t && t.trim() !== ""))];
             if (availableTags.length > 0) {
                 tagContainer.innerHTML = `
                     <div class="tag-chip ${!state.currentWishTagFilter ? 'active' : ''}" onclick="toggleTagFilter(null)">すべて</div>
@@ -551,25 +586,33 @@
                 tagContainer.innerHTML = '';
             }
 
-            // 4. タグでさらにフィルタ
+            // 実際の表示フィルタリングにタグ条件と検索条件を適用
             if (state.currentWishTagFilter) {
                 filtered = filtered.filter(item => item.tags === state.currentWishTagFilter);
             }
+            filtered = filtered.filter(matchesSearch);
 
-            // 5. リスト描画
+            // 検索中ラベルの表示
+            if (state.currentSearchFilter) {
+                const searchLabel = `<div style="font-size:12px; color:var(--accent-color); margin-bottom:10px; padding:0 5px;">ワード: 「${state.currentSearchFilter}」で絞り込み中 <span style="text-decoration:underline; cursor:pointer;" onclick="applyKeywordFilter(null)">(解除)</span></div>`;
+                list.innerHTML = searchLabel;
+            } else {
+                list.innerHTML = '';
+            }
+
             if (filtered.length === 0) {
-                list.innerHTML = `<p style="text-align:center;color:var(--text-sub);font-size:0.8rem;width:100%;margin-top:20px;">アイテムがありません</p>`;
+                list.innerHTML += `<p style="text-align:center;color:var(--text-sub);font-size:0.8rem;width:100%;margin-top:20px;">条件に合うアイテムがありません</p>`;
                 return;
             }
 
-            list.innerHTML = filtered.map(item => {
+            list.innerHTML += filtered.map(item => {
                 const idx = all.indexOf(item);
                 const domain = new URL(item.url).hostname;
                 const fav = `https://www.google.com/s2/favicons?sz=128&domain=${domain}`;
                 return `
-                    <div class="panel-item" oncontextmenu="return false;">
+                    <div class="panel-item" oncontextmenu="false;">
                         <a class="wish-thumb-container" href="${item.url}" target="_blank" 
-                           onclick="if(state.isLongPress){event.preventDefault();return false;}"
+                           onclick="if(state.isLongPress || state.preventNextClick){event.preventDefault();return false;}"
                            onmousedown="if(!state.isTouchDevice) handlePressStart(event, ${idx}, 'wish')" 
                            onmouseup="if(!state.isTouchDevice) handlePressEnd(event, ${idx}, 'wish')" 
                            ontouchstart="handlePressStart(event, ${idx}, 'wish')" 
@@ -626,6 +669,25 @@
         }
 
         // --- Modal Edit Actions ---
+        function renderModalTagChips() {
+            const container = document.getElementById('modal-tag-chips');
+            const allItems = db.getWishItems();
+            const uniqueTags = [...new Set(allItems.map(i => i.tags).filter(t => t && t.trim() !== ""))];
+            
+            if (uniqueTags.length === 0) {
+                container.innerHTML = '<span style="font-size:10px;color:var(--text-sub)">登録済みのタグはありません</span>';
+                return;
+            }
+            
+            container.innerHTML = uniqueTags.map(tag => `
+                <div class="modal-tag-chip" onclick="setEditTag('${tag}')">${tag}</div>
+            `).join('');
+        }
+
+        function setEditTag(tag) {
+            document.getElementById('edit-wish-tag').value = tag;
+        }
+
         function saveWishEdit() {
             const items = db.getWishItems();
             const item = items[state.editingWishIndex];
@@ -633,7 +695,7 @@
             item.status = document.getElementById('edit-wish-status').value;
             item.releaseDate = document.getElementById('edit-wish-date').value;
             item.price = document.getElementById('edit-wish-price').value;
-            item.tags = document.getElementById('edit-wish-tag').value;
+            item.tags = document.getElementById('edit-wish-tag').value.trim();
             db.set(CONFIG.keys.wish, items);
             toggleModal('status-modal', false);
             renderWishItems();
@@ -643,8 +705,8 @@
         function handlePressStart(e, idx, type) {
             state.isLongPress = false;
             state.isScrolling = false;
+            state.preventNextClick = false; // 初期化
             
-            // 座標取得（マウス/タッチ両対応）
             if (e.touches) {
                 state.touchPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
             } else {
@@ -652,14 +714,13 @@
             }
 
             state.pressTimer = setTimeout(() => {
-                // スクロール中でなければ長押し認定
                 if (!state.isScrolling) {
                     state.isLongPress = true;
-                    // バイブレーション（Android等対応機種のみ）
+                    state.preventNextClick = true; // 指を離すまでクリックイベントを阻止
+                    
                     if (navigator.vibrate) navigator.vibrate(50);
                     
                     if (type === 'panel') {
-                        // パネル: 長押しで編集/削除
                         handlePanelEdit(idx);
                     } else {
                         // ウィッシュリスト: 長押しで詳細編集
@@ -670,7 +731,9 @@
                         document.getElementById('edit-wish-date').value = item.releaseDate || "";
                         document.getElementById('edit-wish-price').value = item.price || "";
                         document.getElementById('edit-wish-tag').value = item.tags || "";
-                        toggleModal('status-modal', true);
+                        
+                        // モーダル表示を少し遅らせて、表示直後の誤タップを物理的に防ぐ
+                        setTimeout(() => toggleModal('status-modal', true), 50);
                     }
                 }
             }, CONFIG.longPressDuration);
@@ -678,12 +741,10 @@
 
         function handleTouchMove(e) {
             if (!state.touchPos) return;
-            // 移動量を計算
             const move = Math.hypot(
                 e.touches[0].clientX - state.touchPos.x, 
                 e.touches[0].clientY - state.touchPos.y
             );
-            // 10px以上動いたらスクロールとみなし、長押しタイマー解除
             if (move > 10) {
                 state.isScrolling = true;
                 clearTimeout(state.pressTimer);
@@ -698,31 +759,37 @@
         function handlePressEnd(e, idx, type) {
             clearTimeout(state.pressTimer);
             
-            // 長押しが成立していた場合はクリック動作（リンク遷移など）を無効化
+            // 指を離した瞬間にフラグを解除するが、このイベント自体の伝播は防ぐ
             if (state.isLongPress) {
                 if(e.cancelable) e.preventDefault();
+                // 離した瞬間にフラグを落とすと直後のclickイベントが走る場合があるため、僅かにディレイ
+                setTimeout(() => { 
+                    state.isLongPress = false;
+                    state.preventNextClick = false;
+                }, 100);
                 return;
             }
 
-            // スクロールしていたら何もしない
             if (state.isScrolling) return;
 
-            // タップ（ショートプレス）時の動作
+            // ② タップ動作の書き換え: アニメイトを開く代わりに絞り込みを呼び出す
             if (type === 'panel') {
                 const item = db.getKeywords()[idx];
-                const enc = encodeURIComponent(item.word);
-                window.open(`${CONFIG.urls.animate}${enc}`, '_blank');
+                applyKeywordFilter(item.word);
             }
         }
 
-        // パネル（キーワード）の編集・削除ロジック
         function handlePanelEdit(idx) {
             const keywords = db.getKeywords();
             const currentWord = keywords[idx].word;
             
             const newWord = prompt("キーワードを編集\n(空欄にしてOKを押すと削除されます)", currentWord);
             
-            if (newWord === null) return; 
+            if (newWord === null) {
+                state.isLongPress = false;
+                state.preventNextClick = false;
+                return; 
+            }
 
             if (newWord.trim() === "") {
                 if(confirm(`「${currentWord}」を削除しますか？`)) {
@@ -735,9 +802,10 @@
                 db.set(CONFIG.keys.keywords, keywords);
                 renderPanels();
             }
+            state.isLongPress = false;
+            state.preventNextClick = false;
         }
 
-        // Enter key support
         document.getElementById('keyword-input').onkeypress = (e) => e.key === 'Enter' && addPanel();
         document.getElementById('wish-input').onkeypress = (e) => e.key === 'Enter' && addWishItem();
     </script>
