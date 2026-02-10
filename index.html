@@ -16,22 +16,19 @@
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('./sw.js')
- 
            .then(reg => console.log('SW registered'))
             .catch(err => console.error('SW failed', err));
         });
-}
+      }
     </script>
 
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;500&family=Quicksand:wght@500&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* 大人可愛いピンク系カラーパレットへの変更 */
             --primary-bg: #fff9f9;
-            --accent-color: #e5989b; /* 落ち着いたダスティピンク */
+            --accent-color: #e5989b; 
             --accent-soft: #f4dada;
             --text-main: #6d5959;
-            /* 少し赤みのあるグレーブラウン */
             --text-sub: #b5a4a4;
             --card-bg: #ffffff;
             --delete-hover: #ffb4b4;
@@ -52,7 +49,6 @@
             user-select: none;
             -webkit-user-select: none;
             overscroll-behavior-y: none;
-            /* バウンス抑制 */
         }
 
         .container { 
@@ -64,10 +60,8 @@
             box-shadow: 0 10px 30px rgba(229, 152, 155, 0.15);
         }
 
-        h2 { font-size: 1.4rem; margin-bottom: 8px; color: var(--accent-color); font-weight: 500;
-        }
-        .label { font-size: 12px; color: var(--text-sub); margin-bottom: 25px;
-        }
+        h2 { font-size: 1.4rem; margin-bottom: 8px; color: var(--accent-color); font-weight: 500; }
+        .label { font-size: 12px; color: var(--text-sub); margin-bottom: 25px; }
 
         .section-title {
             font-size: 0.9rem;
@@ -82,10 +76,8 @@
             padding: 6px; border-radius: 12px; border: 1px solid var(--border-color);
         }
 
-        .input-controls, .wish-controls { display: flex; gap: 8px; margin: 8px 0 15px;
-        }
+        .input-controls, .wish-controls { display: flex; gap: 8px; margin: 8px 0 15px; }
 
-        /* iOSでのズーム防止のためフォントサイズを16px以上に調整、またはscale調整 */
         input[type="text"], select { 
             flex: 1;
             padding: 12px 15px; border: none; background: transparent;
@@ -106,17 +98,21 @@
             font-size: 14px; transition: all 0.2s; white-space: nowrap;
             touch-action: manipulation;
         }
-        .add-btn.wish { background: var(--text-sub);
-        }
-        .add-btn.sub { background: var(--accent-soft); color: var(--text-main); font-size: 11px; padding: 4px 10px;
-        }
-        .add-btn:active { transform: scale(0.95); opacity: 0.8;
-        }
-        .add-btn:disabled { background: #ccc; cursor: not-allowed; transform: none;
-        }
+        .add-btn.wish { background: var(--text-sub); }
+        .add-btn.sub { background: var(--accent-soft); color: var(--text-main); font-size: 11px; padding: 4px 10px; }
+        .add-btn:active { transform: scale(0.95); opacity: 0.8; }
+        .add-btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
 
-        .panel-list { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 15px;
+        /* レイアウト切替ボタン用 */
+        .layout-toggle {
+            display: flex; gap: 4px; background: #f7eded; padding: 3px; border-radius: 8px;
         }
+        .layout-btn {
+            padding: 4px 8px; font-size: 12px; cursor: pointer; border-radius: 6px; border: none; background: transparent; color: var(--text-sub);
+        }
+        .layout-btn.active { background: white; color: var(--accent-color); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+
+        .panel-list { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 15px; }
 
         .wish-tabs, .group-tabs {
             display: flex;
@@ -124,9 +120,7 @@
             border-bottom: 1px solid var(--border-color);
             overflow-x: auto; white-space: nowrap;
             -webkit-overflow-scrolling: touch;
-            /* スムーズスクロール */
             padding-bottom: 5px;
-            /* スクロールバー用余白 */
         }
 
         .wish-tab, .group-tab {
@@ -136,50 +130,45 @@
             transition: all 0.2s;
             display: flex; flex-direction: column; align-items: center; gap: 2px;
             min-width: 60px;
-            /* タップしやすく */
         }
 
-        .wish-tab:active, .group-tab:active { background: #fff5f5;
-        }
-
+        .wish-tab:active, .group-tab:active { background: #fff5f5; }
         .wish-tab.active, .group-tab.active {
             background: var(--primary-bg);
             color: var(--text-main);
             font-weight: bold; border-bottom: 2px solid var(--accent-color);
         }
 
-        .tab-badge { font-size: 10px;
-            background: #f0eded; padding: 1px 6px; border-radius: 10px; }
-        .active .tab-badge { background: var(--accent-color);
-            color: white; }
+        .tab-badge { font-size: 10px; background: #f0eded; padding: 1px 6px; border-radius: 10px; }
+        .active .tab-badge { background: var(--accent-color); color: white; }
 
-        /* タグチップ用のスタイル */
         .filter-tags-container, .modal-tags-container {
-            display: flex;
-            flex-wrap: wrap; gap: 8px; margin-bottom: 15px;
+            display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px;
         }
         .tag-chip {
-            padding: 4px 12px;
-            border-radius: 20px; background: #fdf0f0;
+            padding: 4px 12px; border-radius: 20px; background: #fdf0f0;
             font-size: 11px; color: var(--text-sub); cursor: pointer;
             transition: all 0.2s; border: 1px solid transparent;
         }
         .tag-chip.active {
-            background: var(--accent-color);
-            color: white;
+            background: var(--accent-color); color: white;
             box-shadow: 0 2px 8px rgba(229, 152, 155, 0.3);
         }
         .modal-tag-chip {
-            padding: 4px 10px;
-            border-radius: 6px; background: #f7eded;
+            padding: 4px 10px; border-radius: 6px; background: #f7eded;
             font-size: 10px; color: var(--text-main); cursor: pointer;
         }
 
-        #wish-list.panel-list { 
+        /* Wish List 表示切替用スタイル */
+        #wish-list.list-view { 
             display: flex !important;
-            flex-direction: column !important; /* 縦に並べる */
+            flex-direction: column !important;
             gap: 16px;
-            /* アイテム間の余白を少し広げる */
+        }
+        #wish-list.grid-view {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
         }
 
         .panel-item { 
@@ -187,144 +176,103 @@
             align-items: center; background: #fff;
             border: 1px solid var(--border-color); border-radius: 12px;
             transition: transform 0.1s ease, box-shadow 0.2s ease; overflow: hidden;
-            touch-action: pan-y; /* 横スクロール無効、縦スクロール有効 */
+            touch-action: pan-y;
         }
         
-        .panel-item:active {
-            transform: scale(0.98);
-            background-color: #fffafa;
-        }
+        .panel-item:active { transform: scale(0.98); background-color: #fffafa; }
         
+        /* Wish List内のアイテム共通設定 */
         #wish-list .panel-item {
             position: relative;
-            flex-direction: column; /* 画像とテキストを縦に並べる */
+            flex-direction: column; 
             width: 100% !important;
             height: auto;
             aspect-ratio: auto;
         }
 
+        /* グリッド表示時の調整 */
+        #wish-list.grid-view .wish-title-area {
+            font-size: 11px;
+            -webkit-line-clamp: 2;
+            height: 2.8em;
+        }
+        #wish-list.grid-view .wish-meta-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 2px;
+        }
+
         .shop-btn {
-            display: flex;
-            align-items: center; justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             width: 44px; height: 44px; text-decoration: none;
             -webkit-tap-highlight-color: rgba(0,0,0,0.05);
-            flex-shrink: 0; /* ボタンのサイズを維持 */
+            flex-shrink: 0;
         }
 
-        .color-dot { width: 14px; height: 14px; border-radius: 50%;
-        }
-        .dot-animate { background-color: var(--animate-soft);
-        }
-        .dot-gamers { background-color: var(--gamers-soft);
-        }
+        .color-dot { width: 14px; height: 14px; border-radius: 50%; }
+        .dot-animate { background-color: var(--animate-soft); }
+        .dot-gamers { background-color: var(--gamers-soft); }
 
         .keyword-display {
-            flex: 1;
-            padding: 12px 15px; font-size: 0.95rem; font-weight: 500;
-            cursor: pointer;
-            /* テキストが長い場合に「...」にする修正 */
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            /* ロングプレス時のメニュー抑制 */
+            flex: 1; padding: 12px 15px; font-size: 0.95rem; font-weight: 500;
+            cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
             -webkit-touch-callout: none;
         }
 
         .wish-thumb-container {
-            width: 100%;
-            aspect-ratio: 1 / 1; /* 正方形に固定 */
-            display: flex; align-items: center;
-            justify-content: center; overflow: hidden; position: relative;
+            width: 100%; aspect-ratio: 1 / 1; 
+            display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;
             -webkit-touch-callout: none;
         }
 
-        .wish-thumb { width: 100%;
-            height: 100%; object-fit: cover; background: #fffcfc; pointer-events: none;
-        }
+        .wish-thumb { width: 100%; height: 100%; object-fit: cover; background: #fffcfc; pointer-events: none; }
 
         .wish-tag-badge {
-            position: absolute;
-            top: 8px; left: 8px; background: rgba(229, 152, 155, 0.9);
+            position: absolute; top: 8px; left: 8px; background: rgba(229, 152, 155, 0.9);
             color: white; font-size: 11px; padding: 3px 10px; border-radius: 4px;
-            max-width: 80%;
-            overflow: hidden; text-overflow: ellipsis;
+            max-width: 80%; overflow: hidden; text-overflow: ellipsis;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         
-        /* テキストゾーンのスタイル調整 */
-        .wish-info-container {
-            width: 100%;
-            padding: 12px;
-            box-sizing: border-box;
-            background: #fff;
-        }
+        .wish-info-container { width: 100%; padding: 12px; box-sizing: border-box; background: #fff; }
 
         .wish-title-area {
-            width: 100%;
-            padding: 0; font-size: 13px; line-height: 1.4; color: var(--text-main);
+            width: 100%; padding: 0; font-size: 13px; line-height: 1.4; color: var(--text-main);
             display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
             overflow: hidden; margin-bottom: 8px; pointer-events: none;
         }
 
-        .wish-meta-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 12px;
-        }
-
-        .wish-date-label { color: var(--text-sub);
-        }
-        .wish-price-label { color: var(--accent-color); font-weight: 600;
-        }
+        .wish-meta-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
+        .wish-date-label { color: var(--text-sub); }
+        .wish-price-label { color: var(--accent-color); font-weight: 600; }
 
         .del-btn {
-            background: transparent;
-            color: #eee; border: none; width: 44px; height: 44px;
-            cursor: pointer; font-size: 18px; transition: all 0.2s;
-            touch-action: manipulation;
+            background: transparent; color: #eee; border: none; width: 44px; height: 44px;
+            cursor: pointer; font-size: 18px; transition: all 0.2s; touch-action: manipulation;
         }
         #wish-list .del-btn {
-            position: absolute;
-            top: 0; right: 0; background: rgba(255, 255, 255, 0.6);
-            width: 32px; height: 32px;
-            /* 少し大きく */
-            border-bottom-left-radius: 8px;
-            display: flex; align-items: center;
-            justify-content: center;
-            z-index: 2;
+            position: absolute; top: 0; right: 0; background: rgba(255, 255, 255, 0.6);
+            width: 32px; height: 32px; border-bottom-left-radius: 8px;
+            display: flex; align-items: center; justify-content: center; z-index: 2;
         }
-        .del-btn:active { color: var(--delete-hover);
-            background: rgba(255, 240, 240, 0.9); }
+        .del-btn:active { color: var(--delete-hover); background: rgba(255, 240, 240, 0.9); }
 
         .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--overlay-bg); display: none; justify-content: center;
             align-items: center; z-index: 1000; backdrop-filter: blur(4px);
         }
         .modal-content {
-            background: var(--card-bg);
-            width: 90%; max-width: 400px;
+            background: var(--card-bg); width: 90%; max-width: 400px;
             padding: 25px; border-radius: 20px; max-height: 90vh; overflow-y: auto;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-            -webkit-overflow-scrolling: touch;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1); -webkit-overflow-scrolling: touch;
         }
-        .edit-form-group { margin-bottom: 15px;
-        }
-        .edit-form-group label { display: block; font-size: 11px; color: var(--text-sub); margin-bottom: 5px;
-        }
+        .edit-form-group { margin-bottom: 15px; }
+        .edit-form-group label { display: block; font-size: 11px; color: var(--text-sub); margin-bottom: 5px; }
         .edit-form-group input, .edit-form-group select {
-            width: 100%;
-            border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; box-sizing: border-box;
-            font-size: 16px;
-            /* ズーム防止 */
+            width: 100%; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; box-sizing: border-box; font-size: 16px;
         }
-        .manage-item {
-            display: flex;
-            justify-content: space-between; align-items: center;
-            padding: 12px; border-bottom: 1px solid var(--border-color);
-        }
+        .manage-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid var(--border-color); }
     </style>
 </head>
 <body>
@@ -349,7 +297,13 @@
         <div id="group-tabs-container" class="group-tabs"></div>
         <div id="panel-list-container"></div>
 
-        <div class="section-title" id="wish-list-section">Wish List</div>
+        <div class="section-title" id="wish-list-section">
+            Wish List
+            <div class="layout-toggle">
+                <button id="btn-list" class="layout-btn active" onclick="setWishLayout('list')">リスト</button>
+                <button id="btn-grid" class="layout-btn" onclick="setWishLayout('grid')">2列</button>
+            </div>
+        </div>
         <div class="input-group">
             <input type="text" id="wish-input" placeholder="商品のURLを貼り付け...">
             <button id="wish-save-btn" class="add-btn wish" onclick="addWishItem()">保存</button>
@@ -380,7 +334,7 @@
 
         <div id="filter-tags" class="filter-tags-container"></div>
 
-        <div id="wish-list"></div>
+        <div id="wish-list" class="list-view"></div>
     </div>
 
     <div id="group-modal" class="modal-overlay" onclick="toggleModal('group-modal', false)">
@@ -422,7 +376,7 @@
                 </div>
             </div>
             <div class="edit-form-group">
-                <label>タグ (直接入力または下のチップを選択)</label>
+                <label>タグ</label>
                 <input type="text" id="edit-wish-tag">
                 <div id="modal-tag-chips" class="modal-tags-container" style="margin-top:8px;"></div>
             </div>
@@ -435,7 +389,8 @@
             keys: {
                 keywords: 'animate_search_keywords_v2',
                 groups: 'animate_groups_v1',
-                wish: 'animate_wish_list_v2'
+                wish: 'animate_wish_list_v2',
+                layout: 'animate_wish_layout_v1'
             },
             urls: {
                 animate: 'https://www.animate-onlineshop.jp/products/list.php?smt=',
@@ -449,6 +404,7 @@
             currentGroupTab: '未分類',
             currentWishTagFilter: null,
             currentSearchFilter: null, 
+            currentWishLayout: localStorage.getItem(CONFIG.keys.layout) || 'list',
             editingWishIndex: null,
             pressTimer: null,
             isLongPress: false,
@@ -457,11 +413,10 @@
             isTouchDevice: false,
             preventNextClick: false
         };
-        // --- Data Access Helpers ---
+
         const db = {
             get: (key, fallback) => JSON.parse(localStorage.getItem(key)) || fallback,
             set: (key, val) => localStorage.setItem(key, JSON.stringify(val)),
-            
             getGroups: () => db.get(CONFIG.keys.groups, ["毎日", "ジャンル名", "今やってるやつ"]),
             getKeywords: () => {
                 const data = db.get(CONFIG.keys.keywords, [{word: "クリアファイル", group: "未分類"}]);
@@ -469,11 +424,13 @@
             },
             getWishItems: () => db.get(CONFIG.keys.wish, [])
         };
+
         window.onload = () => { 
             window.addEventListener('touchstart', function() {
                 state.isTouchDevice = true;
             }, {passive: true, once: true});
             refreshAll();
+            applyLayoutUI();
         };
 
         function refreshAll() {
@@ -482,13 +439,27 @@
             renderWishItems();
         }
 
+        // レイアウト切替
+        function setWishLayout(mode) {
+            state.currentWishLayout = mode;
+            localStorage.setItem(CONFIG.keys.layout, mode);
+            applyLayoutUI();
+            renderWishItems();
+        }
+
+        function applyLayoutUI() {
+            const isGrid = state.currentWishLayout === 'grid';
+            document.getElementById('wish-list').className = isGrid ? 'grid-view' : 'list-view';
+            document.getElementById('btn-list').classList.toggle('active', !isGrid);
+            document.getElementById('btn-grid').classList.toggle('active', isGrid);
+        }
+
         function toggleModal(id, show) {
             document.getElementById(id).style.display = show ? 'flex' : 'none';
             if(id === 'group-modal' && show) renderModalGroups();
             if(id === 'status-modal' && show) renderModalTagChips();
         }
 
-        // --- Group Management ---
         function updateGroupSelect() {
             const select = document.getElementById('group-select');
             const groups = ["未分類", ...db.getGroups()];
@@ -533,7 +504,6 @@
             renderModalGroups();
         }
 
-        // --- Search Panels ---
         function renderPanels() {
             const tabs = document.getElementById('group-tabs-container');
             const container = document.getElementById('panel-list-container');
@@ -549,6 +519,7 @@
                     </div>
                 `;
             }).join('');
+
             const filtered = keywords.filter(k => (k.group || "未分類") === state.currentGroupTab);
             if (filtered.length === 0) {
                 container.innerHTML = `<p style="text-align:center;color:var(--text-sub);font-size:0.8rem">なし</p>`;
@@ -587,7 +558,6 @@
             renderPanels();
         }
 
-        // --- Wish List ---
         function switchWishTab(s) {
             state.currentWishTab = s;
             document.querySelectorAll('.wish-tab').forEach(t => {
@@ -606,9 +576,7 @@
             renderPanels();
             renderWishItems();
             const section = document.getElementById('wish-list-section');
-            if(section) {
-                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
+            if(section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         function renderWishItems() {
@@ -622,19 +590,20 @@
                 return (item.title && item.title.toLowerCase().includes(searchLower)) || 
                        (item.tags && item.tags.toLowerCase().includes(searchLower));
             };
+
             const counts = { '迷い中': 0, '購入・予約済': 0, '出たら買う': 0, 'やめた': 0 };
             all.forEach(item => {
                 const status = item.status || '迷い中';
                 const tagMatch = !state.currentWishTagFilter || item.tags === state.currentWishTagFilter;
                 const searchMatch = matchesSearch(item);
-                if (tagMatch && searchMatch) {
-                    counts[status]++;
-                }
+                if (tagMatch && searchMatch) counts[status]++;
             });
+
             Object.keys(counts).forEach(k => {
                 const badgeId = { '迷い中':'badge-mayoi', '購入・予約済':'badge-bought', '出たら買う':'badge-future', 'やめた':'badge-cancel' }[k];
                 document.getElementById(badgeId).textContent = counts[k];
             });
+
             let filtered = all.filter(item => (item.status || '迷い中') === state.currentWishTab);
             const availableTags = [...new Set(all.map(item => item.tags).filter(t => t && t.trim() !== ""))];
             if (availableTags.length > 0) {
@@ -652,9 +621,9 @@
                 filtered = filtered.filter(item => item.tags === state.currentWishTagFilter);
             }
             filtered = filtered.filter(matchesSearch);
+
             if (state.currentSearchFilter) {
-                const searchLabel = `<div style="font-size:12px; color:var(--accent-color); margin-bottom:10px; padding:0 5px;">ワード: 「${state.currentSearchFilter}」で絞り込み中 <span style="text-decoration:underline; cursor:pointer;" onclick="applyKeywordFilter(null)">(解除)</span></div>`;
-                list.innerHTML = searchLabel;
+                list.innerHTML = `<div style="font-size:12px; color:var(--accent-color); margin-bottom:10px; padding:0 5px; width:100%;">ワード: 「${state.currentSearchFilter}」で絞り込み中 <span style="text-decoration:underline; cursor:pointer;" onclick="applyKeywordFilter(null)">(解除)</span></div>`;
             } else {
                 list.innerHTML = '';
             }
@@ -702,7 +671,6 @@
 
             btn.disabled = true;
             btn.innerText = "...";
-            
             let newItem = { url, title: "URLのみ保存", image: null, status: state.currentWishTab, releaseDate: "", price: "", tags: "" };
 
             try {
@@ -712,8 +680,7 @@
                     newItem.title = json.data.title || newItem.title;
                     newItem.image = json.data.image ? json.data.image.url : null;
                 }
-            } catch (e) { console.error("Fetch failed");
-            }
+            } catch (e) { console.error("Fetch failed"); }
 
             const items = db.getWishItems();
             items.unshift(newItem);
@@ -732,7 +699,6 @@
             renderWishItems();
         }
 
-        // --- Modal Edit Actions ---
         function renderModalTagChips() {
             const container = document.getElementById('modal-tag-chips');
             const allItems = db.getWishItems();
@@ -741,7 +707,6 @@
                 container.innerHTML = '<span style="font-size:10px;color:var(--text-sub)">登録済みのタグはありません</span>';
                 return;
             }
-            
             container.innerHTML = uniqueTags.map(tag => `
                 <div class="modal-tag-chip" onclick="setEditTag('${tag}')">${tag}</div>
             `).join('');
@@ -764,12 +729,10 @@
             renderWishItems();
         }
 
-        // --- Improved Logic for Touch/Long Press ---
         function handlePressStart(e, idx, type) {
             state.isLongPress = false;
             state.isScrolling = false;
             state.preventNextClick = false;
-            
             if (e.touches) {
                 state.touchPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
             } else {
@@ -825,7 +788,6 @@
                 }, 100);
                 return;
             }
-
             if (state.isScrolling) return;
             if (type === 'panel') {
                 const item = db.getKeywords()[idx];
@@ -837,13 +799,11 @@
             const keywords = db.getKeywords();
             const currentWord = keywords[idx].word;
             const newWord = prompt("キーワードを編集\n(空欄にしてOKを押すと削除されます)", currentWord);
-            
             if (newWord === null) {
                 state.isLongPress = false;
                 state.preventNextClick = false;
                 return; 
             }
-
             if (newWord.trim() === "") {
                 if(confirm(`「${currentWord}」を削除しますか？`)) {
                     keywords.splice(idx, 1);
